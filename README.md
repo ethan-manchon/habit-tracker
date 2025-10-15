@@ -1,42 +1,67 @@
-# Next.js Next-Auth Starter Template
 
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Application de suivi de routines
 
-![Homepage Screenshot](https://github.com/rezahedi/nextjs-nextauth-starter/blob/main/public/Screenshot_2023-07-19_180913.png)
+> Ce projet utilise le starter Next.js + NextAuth ([voir le template d'origine](https://github.com/rezahedi/nextjs-nextauth-starter)).
 
-## Getting Started
+## Présentation
 
-Create your .env file as the following or from the `.env.example` and fill it with your credentials, in the case of database I used Postgres hosted on Vercel with Prisma ORM, setup your database and fill the `POSTGRES_PRISMA_URL` and `POSTGRES_URL_NON_POOLING` with your database credentials.
+Application web minimaliste (mobile-first, thème sombre) pour le suivi de routines quotidiennes, hébergée sur Vercel et utilisant Supabase comme base de données. L’interface est pensée pour la simplicité et l’efficacité.
 
-```bash
-# Only required for localhost
-NEXTAUTH_URL=http://localhost:3000
-# Only for production – generate one here: https://generate-secret.vercel.app/32
-NEXTAUTH_SECRET=""
-GOOGLE_CLIENT_ID=""
-GOOGLE_SECRET_ID=""
-POSTGRES_PRISMA_URL=""
-POSTGRES_URL_NON_POOLING=""
-```
+## Fonctionnalités principales
 
-Then, install all packages and run the development server:
+- **Calendrier** : Affichage des jours jusqu’à aujourd’hui pour visualiser la progression.
+- **Gestion des comptes** : Inscription, connexion, modification et suppression du compte utilisateur.
+- **Ajout de routine** :
+  - Bouton « + » pour créer une routine
+  - Deux types :
+	 - Oui/Non (fait/pas fait)
+	 - Numérique (objectif chiffré + unité, saisie quotidienne)
+- **Affichage des routines** :
+  - Liste simple et espace dédié à la visualisation
+  - Suivi par coche (Oui/Non) ou saisie de valeur (Numérique)
 
-```bash
-npm install
-npm run dev
-```
+## Fonctionnalités avancées (v1.0+)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- Modification/suppression de routine
+- Configuration de la fréquence (jours affichés, nombre de fois/jour)
+- Drag & drop pour réorganiser
+- Affichage graphique de la progression (par type de routine)
+- Organisation par tags et tri
 
-This project have two [Routing Groups](https://nextjs.org/docs/app/building-your-application/routing/route-groups) `(home)` and `(admin)` to have seperate root layouts for each. The `(home)` is for our root segment `/` that you can start editing the home page by modifying `app/(home)/page.tsx`. The `(admin)` is for our admin dashboard segment `/admin` that you can start editing the admin dashboard by modifying `app/(admin)/admin/page.tsx`.
+## Améliorations futures
 
-Here a screenshot of admin page with CRUD functions under `/posts` folder, by reviewing the codes you can learn more about how to use server actions in client side, how to create modal and forms and much more:
+- Graphiques de progrès (7/30 jours)
+- Affichage de séries (ex : « 5 jours d’affilée »)
+- Personnalisation des thèmes et couleurs
+- Partage et comparaison entre utilisateurs
+- Statistiques avancées et export d’images
 
-![Admin CRUD section with edit page opened as a modal](https://github.com/rezahedi/nextjs-nextauth-starter/blob/main/public/Screenshot_2023-09-18_180914.png)
+## Stack technique
 
-## Learn More
+- **Next.js** (front + API)
+- **NextAuth** (authentification)
+- **Supabase** (base de données)
+- **Prisma** (ORM)
+- **Tailwind CSS** (UI)
 
-This project build by [Next.js 13](https://nextjs.org/docs/app) [APP Router](https://nextjs.org/docs/app/building-your-application/routing#the-app-router), using [NextAuth](https://next-auth.js.org/getting-started/introduction) for authentication, [Modal Intercepting Routing](https://nextjs.org/docs/app/building-your-application/routing/intercepting-routes) for `/login` modal or route, and styled by Tailwind. This project also included a sample protected route and sub-routes too, It is useful for making admin dashboard. I used [Route Groups](https://nextjs.org/docs/app/building-your-application/routing/route-groups) to make multiple root layouts for each of home page and admin dashboard separatly.
+## Installation & développement
+
+1. Copier `.env.example` en `.env` et compléter les variables (voir Supabase, NextAuth, etc.)
+2. Installer les dépendances :
+	```bash
+	npm install
+	```
+3. Lancer le serveur de développement :
+	```bash
+	npm run dev
+	```
+4. Lancer les migrations Prisma si besoin :
+	```bash
+	npx prisma migrate dev
+	```
+
+---
+Pour toute question, se référer au fichier `CONSIGNES.md` ou contacter l’équipe projet.
 
 I made this project to help me understand how to use Next.js 13 APP Router structure and how to setup NextAuth, also to have a simple starter template for my future projects that need authentication.
 
