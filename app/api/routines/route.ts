@@ -41,7 +41,7 @@ export async function POST(req: Request) {
         goal: goal ?? null,
         frequency: frequency ?? undefined,
         everyNDays: everyNDays ?? null,
-        weekDays: weekDays ?? null,
+        weekDays: weekDays ?? [],
         tags: { connectOrCreate: tagOps },
       },
       include: { tags: true },

@@ -92,7 +92,7 @@ model Routine {
   goal       Int?
   frequency  FrequencyType @default(DAILY)
   everyNDays Int?
-  weekDays   Int[]?
+  weekDays   Int[]
   tags       Tag[]
   createdAt  DateTime      @default(now())
   updatedAt  DateTime      @updatedAt
