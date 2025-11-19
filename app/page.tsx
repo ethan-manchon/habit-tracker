@@ -18,7 +18,7 @@ export default async function Home() {
 
           <section className="w-full max-w-2xl px-4">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-gray-100">Aujourd'hui</h2>
+              <h2 className="text-lg font-semibold text-gray-100">Aujourd&apos;hui</h2>
               <div className="text-sm text-gray-400">0/3 complétées</div>
             </div>
 

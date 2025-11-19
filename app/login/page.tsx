@@ -318,7 +318,7 @@ export default function LoginPage() {
 
       {/* Terms */}
       <p className="text-xs text-gray-500 text-center mt-6">
-        En continuant, tu acceptes nos conditions d'utilisation.
+        En continuant, tu acceptes nos conditions d&apos;utilisation.
         <br />
         Tes données sont protégées et sécurisées. 🔒
       </p>
