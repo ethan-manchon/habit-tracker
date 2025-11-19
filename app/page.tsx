@@ -2,15 +2,36 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/auth";
 import Link from "next/link";
 import { Button } from "@/components/ui";
-import { Card, CardContent } from "@/components/ui";
+import { Card } from "@/components/ui";
 import { Badge } from "@/components/ui";
+import { Header, Calendar, CreateRoutineButton, FooterNav } from "@/components";
 
 export default async function Home() {
   const session = await getServerSession(authOptions as any);
 
   if (session) {
     return (
-      <h1>Bienvenue de retour!</h1>
+      <div className="min-h-screen pb-32">
+        <Header title="Mes ressources" />
+         <main className="flex flex-col items-center gap-6">
+          {/* <Calendar /> */}
+
+          <section className="w-full max-w-2xl px-4">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-gray-100">Aujourd'hui</h2>
+              <div className="text-sm text-gray-400">0/3 complétées</div>
+            </div>
+
+            <div className="flex flex-col gap-4">
+              {/* <RoutineList /> */}
+            </div>
+          </section>
+
+        </main>
+
+        <CreateRoutineButton />
+        <FooterNav />
+      </div>
     );
   }
 

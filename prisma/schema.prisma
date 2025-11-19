@@ -71,3 +71,38 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+enum RoutineType {
+  BOOLEAN
+  NUMERIC
+}
+
+enum FrequencyType {
+  DAILY
+  EVERY_N_DAYS
+  SPECIFIC_DAYS
+}
+
+model Routine {
+  id         String        @id @default(cuid())
+  userId     String
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name       String
+  icon       String?
+  type       RoutineType   @default(BOOLEAN)
+  goal       Int?
+  frequency  FrequencyType @default(DAILY)
+  everyNDays Int?
+  weekDays   Int[]?
+  tags       Tag[]
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  @@index([userId])
+}
+
+model Tag {
+  id       String    @id @default(cuid())
+  name     String    @unique
+  routines Routine[]
+}
+
