@@ -10,13 +10,8 @@ export const metadata: Metadata = {
   description: "Crée, suis et améliore tes routines quotidiennes",
 };
 
-export default function RootLayout({
-  children,
-  modal,
-}: {
-  children: React.ReactNode;
-  modal?: React.ReactNode;
-}) {
+export default function RootLayout(props: any) {
+  const { children, modal } = props as { children: React.ReactNode; modal?: React.ReactNode };
   return (
     <html lang="fr">
       <body className={inter.className}>
