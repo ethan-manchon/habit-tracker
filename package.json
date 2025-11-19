@@ -19,6 +19,9 @@
     "@types/react": "19.1.8",
     "@types/react-dom": "19.1.6",
     "autoprefixer": "10.4.21",
+    "bcryptjs": "^2.4.3",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "eslint": "9.31.0",
     "eslint-config-next": "15.4.1",
     "next": "^15.4.1",
@@ -28,10 +31,12 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-loading-skeleton": "^3.5.0",
+    "tailwind-merge": "^3.4.0",
     "tailwindcss": "4.1.11",
     "typescript": "5.8.3"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.1.11"
+    "@tailwindcss/postcss": "^4.1.11",
+    "@types/bcryptjs": "^2.4.6"
   }
 }
