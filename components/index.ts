@@ -4,8 +4,9 @@ import Calendar from "./Calendar";
 import RoutineCard from "./RoutineCard";
 import CreateRoutineButton from "./CreateRoutineButton";
 import FooterNav from "./FooterNav";
+import RoutineList from "./RoutineList";
 
-export { Modal, Header, Calendar, RoutineCard, CreateRoutineButton, FooterNav };
+export { Modal, Header, RoutineList, Calendar, RoutineCard, CreateRoutineButton, FooterNav };
 
 // Export UI components
 export * from "./ui";

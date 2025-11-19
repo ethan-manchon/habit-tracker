@@ -4,32 +4,21 @@ import Link from "next/link";
 import { Button } from "@/components/ui";
 import { Card } from "@/components/ui";
 import { Badge } from "@/components/ui";
-import { Header, Calendar, CreateRoutineButton, FooterNav } from "@/components";
+import { Header, CreateRoutineButton, FooterNav } from "@/components";
+import HomeContent from "@/components/HomeContent";
 
 export default async function Home() {
   const session = await getServerSession(authOptions as any);
 
   if (session) {
     return (
-      <div className="min-h-screen pb-32">
+      <div className="mx-16">
         <Header title="Mes ressources" />
-         <main className="flex flex-col items-center gap-6">
-          {/* <Calendar /> */}
-
-          <section className="w-full max-w-2xl px-4">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-gray-100">Aujourd&apos;hui</h2>
-              <div className="text-sm text-gray-400">0/3 complétées</div>
-            </div>
-
-            <div className="flex flex-col gap-4">
-              {/* <RoutineList /> */}
-            </div>
-          </section>
-
-        </main>
-
+        
+        <HomeContent />
+       
         <CreateRoutineButton />
+        
         <FooterNav />
       </div>
     );

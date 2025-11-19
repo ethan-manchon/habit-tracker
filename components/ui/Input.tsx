@@ -12,6 +12,8 @@ interface InputDataProps {
   icon?: any;
   autoFocus?: boolean;
   iconRight?: any;
+  min?: number;
+  max?: number;
 }
 
 interface InputStyleProps {
@@ -48,6 +50,8 @@ export default function Input({
   inputSize = "default",
   autoFocus = false,
   className,
+  min,
+  max,
   type,
   icon,
   iconRight,
@@ -63,6 +67,8 @@ export default function Input({
       )}
       <input
         type={type}
+        min={min}
+        max={max}
         className={cn(
           inputVariants({ variant, inputSize }),
           icon && "pl-10",

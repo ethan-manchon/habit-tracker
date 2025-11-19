@@ -56,9 +56,10 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  accounts Account[]
-  sessions Session[]
-  routines Routine[]
+  accounts   Account[]
+  sessions   Session[]
+  routines   Routine[]
+  progresses Progress[]
 
   @@map("users")
 }
@@ -97,6 +98,7 @@ model Routine {
   tags       Tag[]
   createdAt  DateTime      @default(now())
   updatedAt  DateTime      @updatedAt
+  progresses Progress[]
 
   @@index([userId])
 }
@@ -107,3 +109,20 @@ model Tag {
   routines Routine[]
 }
 
+// Tracks user progress for a routine on a specific date.
+model Progress {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  routineId    String
+  routine      Routine  @relation(fields: [routineId], references: [id], onDelete: Cascade)
+  date         DateTime // stored as a date (time ignored by app logic)
+  booleanValue Boolean? // for boolean routines (true/false)
+  numericValue Int? // for numeric routines (e.g. 3/5)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([routineId, date, userId], name: "unique_progress")
+  @@index([userId])
+  @@index([routineId])
+}
