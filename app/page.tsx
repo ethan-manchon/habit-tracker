@@ -29,7 +29,7 @@ export default async function Home() {
       <div className="text-center max-w-2xl">
         {/* Icon */}
         <div className="flex justify-center mb-4">
-          <div className="w-24 h-24 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 border-transparent flex items-center justify-center">
+          <div className="w-24 h-24 rounded-full bg-gradient-to-r bg-purple-600 border-transparent flex items-center justify-center">
             <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
