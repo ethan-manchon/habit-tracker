@@ -101,7 +101,7 @@ export default function AddRoutine({ open, onClose, onCreated, initial }: Props)
   };
 
   return (
-    <Modal>
+    <Modal onClose={onClose}>
       <Card>
         <CardHeader>
         </CardHeader>

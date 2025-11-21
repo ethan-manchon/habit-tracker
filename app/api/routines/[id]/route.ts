@@ -31,11 +31,31 @@ export async function PATCH(req: Request, ctx: any) {
     if (frequency) updateData.frequency = frequency;
     if (everyNDays !== undefined) updateData.everyNDays = everyNDays;
     if (weekDays !== undefined) updateData.weekDays = weekDays;
-    if (tagOps) updateData.tags = { connectOrCreate: tagOps };
+    if (tagOps) {
+      // if client sent an explicit empty tags array, clear tags
+      if (Array.isArray(tags) && tags.length === 0) {
+        updateData.tags = { set: [] };
+      } else {
+        updateData.tags = { connectOrCreate: tagOps };
+      }
+    } else if (Array.isArray(tags) && tags.length === 0) {
+      // clear tags if explicitly empty
+      updateData.tags = { set: [] };
+    }
 
-    const updated = await (prisma as any).routine.updateMany({
-      where: { id, userId: session.user.id },
+    // verify ownership first
+    const existing = await (prisma as any).routine.findUnique({ where: { id } });
+    if (!existing) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+    if (existing.userId !== session.user.id) {
+      return NextResponse.json({ error: "Unauthenticated" }, { status: 401 });
+    }
+
+    const updated = await (prisma as any).routine.update({
+      where: { id },
       data: updateData,
+      include: { tags: true },
     });
 
     return NextResponse.json({ success: true, updated });

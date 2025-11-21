@@ -1,21 +1,21 @@
 "use client";
 import {useCallback, useRef, useEffect, MouseEventHandler} from "react";
-import {useRouter} from "next/navigation";
 
 export default function Modal({
   children,
   className,
+  onClose,
 }: {
   children: React.ReactNode;
   className?: string;
+  onClose?: () => void;
 }) {
   const overlay = useRef(null);
   const wrapper = useRef(null);
-  const router = useRouter();
 
   const onDismiss = useCallback(() => {
-    router.back();
-  }, [router]);
+    if (onClose) onClose();
+  }, [onClose]);
 
   const onClick: MouseEventHandler = useCallback(
     (e) => {

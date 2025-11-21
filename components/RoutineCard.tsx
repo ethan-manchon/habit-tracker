@@ -119,7 +119,7 @@ export default function RoutineCard({ icon, title, tags = [], progress = 0, goal
       {showActions && menuPos && (
         <div className="fixed inset-0 z-10">
           {/* backdrop to close when clicking elsewhere */}
-          <div className="absolute inset-0" onClick={() => setShowActions(false)} />
+          <div className="absolute inset-0" onClick={() => setShowActions(false)} onContextMenu={() => setShowActions(false)} />
 
           {/* small popup positioned next to the click/tap */}
           <div
@@ -127,13 +127,13 @@ export default function RoutineCard({ icon, title, tags = [], progress = 0, goal
             style={{
               left: `${menuPos.x}px`,
               top: `${menuPos.y}px`,
-              transform: 'translate(-50%, 12px)',
+              transform: 'translate(0%, 12px)',
               willChange: 'transform',
             }}
           >
-            <div className="bg-gray-800 rounded-md p-2 shadow-lg w-44">
+            <div className="bg-gray-800 rounded-md p-1 ">
               <button
-                className="w-full text-left px-3 py-2 rounded hover:bg-gray-700 text-white text-sm"
+                className="w-full text-left cursor-pointer px-3 py-2 rounded hover:bg-gray-700 text-white text-sm"
                 onClick={() => {
                   setShowActions(false);
                   if (onEdit) onEdit();
@@ -142,7 +142,7 @@ export default function RoutineCard({ icon, title, tags = [], progress = 0, goal
                 Éditer
               </button>
               <button
-                className="w-full text-left px-3 py-2 rounded hover:bg-red-500 text-red-100 text-sm mt-1 bg-red-600"
+                className="w-full text-left px-3 cursor-pointer py-2 rounded hover:bg-red-500 text-red-100 text-sm mt-1 bg-red-600"
                 onClick={() => {
                   setShowActions(false);
                   if (onDelete) onDelete();

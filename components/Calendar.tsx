@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 
-const days = ["L", "M", "M", "J", "V", "S", "D"];
+const days = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
 
 type Props = {
   selectedDate?: Date;
@@ -11,8 +11,8 @@ type Props = {
 function startOfWeek(date: Date) {
   // return Monday as start
   const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-  const day = d.getDay(); // 0 = Sun
-  const diff = (day + 6) % 7; // Monday=0
+  const day = d.getDay(); 
+  const diff = (day + 6) % 7;
   d.setDate(d.getDate() - diff);
   return new Date(d.getFullYear(), d.getMonth(), d.getDate());
 }
@@ -72,18 +72,17 @@ export default function Calendar({ selectedDate, onSelectDate }: Props) {
     <div className="w-full max-w-lg mx-auto bg-gray-900/60 rounded-xl p-4 shadow-md">
 
       <div className="flex items-center justify-between text-gray-400 text-sm mb-3">
-        <button className="px-2 text-lg" onClick={prevWeek} aria-label="Semaine précédente">‹</button>
+        <button className="px-2 text-lg cursor-pointer" onClick={prevWeek} aria-label="Semaine précédente">‹</button>
         <div>{rangeLabel}</div>
-        <button className={`px-2 text-lg ${startOfWeek(todayStart).getTime() <= weekStart.getTime() ? "opacity-50 cursor-not-allowed" : ""}`} onClick={nextWeek} aria-label="Semaine suivante">›</button>
+        <button className={`px-2 text-lg cursor-pointer ${startOfWeek(todayStart).getTime() <= weekStart.getTime() ? "opacity-50 cursor-not-allowed" : ""}`} onClick={nextWeek} aria-label="Semaine suivante">›</button>
       </div>
-
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex px-8 items-center justify-between mb-3">
         {days.map((d, i) => (
           <div key={i} className="text-center text-xs text-gray-400 w-8">{d}</div>
         ))}
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex px-8 items-center justify-between mb-3">
         {daysInWeek.map((d, i) => {
           const sel = d.getTime() === selected.getTime();
           const disabled = isFuture(d);
@@ -92,7 +91,7 @@ export default function Calendar({ selectedDate, onSelectDate }: Props) {
               key={i}
               onClick={() => handleSelect(d)}
               disabled={disabled}
-              className={`w-10 h-10 rounded-lg ${sel ? "bg-indigo-700 text-white ring-2 ring-indigo-500" : disabled ? "bg-gray-900/40 text-gray-600 cursor-not-allowed" : "bg-gray-800 text-gray-400"}`}
+              className={`w-8 h-8 rounded-lg cursor-pointer ${sel ? "bg-indigo-700 text-white ring-2 ring-indigo-500" : disabled ? "bg-gray-900/40 text-gray-600 cursor-not-allowed" : "bg-gray-800 text-gray-400"}`}
             >
               {d.getDate()}
             </button>
