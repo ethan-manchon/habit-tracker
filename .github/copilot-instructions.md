@@ -1,46 +1,78 @@
-# Copilot Instructions for AI Agents
+# Copilot Instructions for Habit Tracker
 
-## Project Overview
-- This is a Next.js 13+ project using the App Router, NextAuth for authentication, Prisma ORM (with Postgres), and Tailwind CSS for styling.
-- The codebase is organized into two main route groups: `(home)` for the main site and `(admin)` for the admin dashboard, each with its own root layout and modal structure.
-- Admin CRUD operations for posts are implemented under `app/(admin)/admin/posts/` using server actions and modal routing patterns.
+## Architecture Overview
+Mobile-first habit/routine tracking app. Next.js 16+ App Router, NextAuth v4 (JWT sessions), Prisma ORM with Supabase Postgres, Tailwind CSS v4.
 
-## Key Files & Structure
-- `app/(home)/` — Main site, entry at `page.tsx`, layout at `layout.tsx`.
-- `app/(admin)/admin/` — Admin dashboard, entry at `page.tsx`, layout at `layout.tsx`.
-- `app/(admin)/admin/posts/` — Post CRUD, with modal subroutes for create/edit.
-- `components/` — Shared and admin-specific React components.
-- `lib/prisma.ts` — Prisma client setup.
-- `prisma/schema.prisma` — Database schema.
-- `db.ts` — Database connection logic.
-- `app/api/auth/[...nextauth]/route.ts` — NextAuth API route.
+### Data Model (prisma/schema.prisma)
+- **User** → has many **Routines** → has many **Progress** records
+- **Routine**: BOOLEAN (yes/no) or NUMERIC (value towards goal), with frequency (DAILY, EVERY_N_DAYS, SPECIFIC_DAYS)
+- **Progress**: tracks completion per routine per date with `booleanValue` or `numericValue`
 
-## Patterns & Conventions
-- Use [Next.js App Router](https://nextjs.org/docs/app) conventions for routing, layouts, and server actions.
-- Modal routes use the `@modal/` directory and intercepting route patterns (e.g., `app/(admin)/admin/posts/@modal/(.)edit/[id]/`).
-- Server actions are colocated with UI components (see `actions.ts` in relevant folders).
-- Tailwind CSS is configured via `tailwind.config.js` and used throughout for styling.
-- Environment variables are required for NextAuth and database connections (see `.env.example` in README).
+### Key Data Flow
+1. Client fetches routines from `/api/routines` (GET)
+2. Progress loaded per date from `/api/progress?date=YYYY-MM-DD`
+3. Toggle/numeric updates POST to `/api/progress` with optimistic UI updates
 
-## Developer Workflows
-- **Install dependencies:** `npm install`
-- **Run dev server:** `npm run dev`
-- **Database migration:** Use Prisma CLI (`npx prisma migrate dev`), schema in `prisma/schema.prisma`.
-- **Authentication:** NextAuth is configured in `app/api/auth/[...nextauth]/route.ts`.
-- **Modals:** Use intercepting routes and `@modal/` folders for modal UIs.
+## Project Structure
+```
+app/
+  auth.ts              # NextAuth config (Credentials + Google)
+  providers.tsx        # SessionProvider + ThemeProvider wrapper
+  page.tsx             # Main page (conditional render: auth vs landing)
+  api/
+    routines/route.ts  # CRUD for user routines
+    progress/route.ts  # Progress tracking per date
+    auth/[...nextauth]/route.ts
+components/
+  HomeContent.tsx      # Calendar + RoutineList composition
+  RoutineList.tsx      # Main routine display with optimistic updates
+  AddRoutine.tsx       # Modal form for create/edit
+  Calendar.tsx         # Week-based date selector
+  ui/                  # Reusable components (Button, Card, Input, Badge)
+lib/
+  prisma.ts            # Singleton Prisma client (use this, not db.ts)
+  Icon.tsx             # SVG icon components (no external icon library)
+  utils.ts             # cn() helper for class merging
+```
 
-## Integration Points
-- **Prisma**: All DB access via `lib/prisma.ts` and `db.ts`.
-- **NextAuth**: Auth logic in `app/api/auth/[...nextauth]/route.ts` and `app/auth.ts`.
-- **Tailwind**: Styles in `globals.css`, `adminGlobals.css`, and component classes.
+## Critical Patterns
 
-## Examples
-- To add a new admin modal, create a folder in `app/(admin)/admin/posts/@modal/` and follow the existing pattern.
-- To add a new server action, colocate an `actions.ts` file in the relevant route folder.
+### API Routes
+All routes use `export const dynamic = "force-dynamic"` and check session:
+```typescript
+const session = await getServerSession(authOptions as any);
+if (!session?.user?.id) return NextResponse.json({ error: "Unauthenticated" }, { status: 401 });
+```
 
-## References
-- See `README.md` for setup and environment details.
-- Review `app/(admin)/admin/posts/` for advanced routing and modal patterns.
+### Optimistic UI (RoutineList.tsx)
+Boolean toggles update UI immediately, fire-and-forget fetch. Numeric inputs debounce 300ms before sync.
 
----
-Update this file as project structure or conventions evolve. For questions, review the README and key folders above.
+### Date Handling
+Dates normalized to midnight for consistency. Use `YYYY-MM-DD` string format for API queries.
+
+### Theming
+CSS variables in `globals.css` with `:root` (light) and `.dark` class. Use semantic tokens: `text-foreground`, `bg-card`, `border-border`, `text-accent`.
+
+### Icons
+Import from `@/lib/Icon.tsx` (custom SVG components), NOT external packages.
+
+## Developer Commands
+```bash
+npm run dev            # Start dev server
+npm run build          # Production build
+npx prisma migrate dev # Apply schema changes
+npx prisma generate    # Regenerate client after schema edits
+```
+
+## Environment Variables Required
+```
+NEXTAUTH_URL, NEXTAUTH_SECRET
+GOOGLE_CLIENT_ID, GOOGLE_SECRET_ID  # Optional for OAuth
+POSTGRES_PRISMA_URL, POSTGRES_URL_NON_POOLING
+```
+
+## When Adding Features
+- New API route: follow pattern in `app/api/routines/route.ts`
+- New UI component: client components use `"use client"`, animations via `motion/react`
+- Database changes: update `prisma/schema.prisma`, run migrations
+- Icons: add to `lib/Icon.tsx` as SVG component

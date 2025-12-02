@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from "motion/react";
 import RoutineCard from "@/components/RoutineCard";
 import AddRoutine from "@/components/AddRoutine";
 import { CheckCircle, Target } from "@/lib/Icon";
-import { useRoutines, useProgress } from "@/lib/hooks/useRoutines";
 
 type Props = {
   userId?: string;
@@ -18,27 +17,16 @@ function formatDateStr(d: Date) {
   return `${yyyy}-${mm}-${dd}`;
 }
 
-// Debounce hook for numeric inputs
-function useDebouncedCallback<T extends (...args: any[]) => any>(
-  callback: T,
-  delay: number
-): T {
-  const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
-  const callbackRef = React.useRef(callback);
-  callbackRef.current = callback;
-
-  return React.useCallback(
-    ((...args) => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-      timeoutRef.current = setTimeout(() => callbackRef.current(...args), delay);
-    }) as T,
-    [delay]
-  );
-}
-
 export default function RoutineList({ userId, date }: Props) {
-  const { routines, isLoading: loadingRoutines, error, mutate: mutateRoutines } = useRoutines();
-  
+  const [routines, setRoutines] = React.useState<any[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
+  const [progressByRoutine, setProgressByRoutine] = React.useState<Record<string, any>>({});
+  const [editingRoutine, setEditingRoutine] = React.useState<any | null>(null);
+
+  // Debounce refs for numeric updates
+  const debounceTimers = React.useRef<Record<string, NodeJS.Timeout>>({});
+
   const selectedDate = React.useMemo(() => {
     if (date instanceof Date) return new Date(date.getFullYear(), date.getMonth(), date.getDate());
     if (typeof date === "string" && date) return new Date(date);
@@ -46,100 +34,124 @@ export default function RoutineList({ userId, date }: Props) {
   }, [date]);
 
   const dateStr = React.useMemo(() => formatDateStr(selectedDate), [selectedDate]);
-  
-  const { progress: progressByRoutine, isLoading: loadingProgress, mutate: mutateProgress } = useProgress(dateStr);
 
-  const [editingRoutine, setEditingRoutine] = React.useState<any | null>(null);
-  
-  // Local state for immediate numeric updates (debounced server sync)
-  const [localNumericValues, setLocalNumericValues] = React.useState<Record<string, number>>({});
-
-  // Optimistic update for progress (used for boolean toggles)
-  const updateProgress = React.useCallback(
-    async (routineId: string, updates: { booleanValue?: boolean; numericValue?: number }) => {
-      // Optimistic update - update UI immediately
-      mutateProgress(
-        (currentData: any[] | undefined) => {
-          if (!currentData) return [{ routineId, ...updates }];
-          const existing = currentData.find((p) => p.routineId === routineId);
-          if (existing) {
-            return currentData.map((p) =>
-              p.routineId === routineId ? { ...p, ...updates } : p
-            );
-          }
-          return [...currentData, { routineId, ...updates }];
-        },
-        false // Don't revalidate immediately
-      );
-
-      try {
-        await fetch("/api/progress", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({ routineId, date: dateStr, ...updates }),
-        });
-      } catch (err) {
-        console.error(err);
-        // Revalidate on error to restore correct state
-        mutateProgress();
-      }
-    },
-    [dateStr, mutateProgress]
-  );
-
-  // Debounced server update for numeric values (500ms delay)
-  const debouncedNumericUpdate = useDebouncedCallback(
-    async (routineId: string, numericValue: number) => {
-      try {
-        await fetch("/api/progress", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({ routineId, date: dateStr, numericValue }),
-        });
-        // Update SWR cache after server update
-        mutateProgress();
-      } catch (err) {
-        console.error(err);
-        mutateProgress();
-      }
-    },
-    500
-  );
-
-  // Handler for numeric changes - immediate local update + debounced server sync
-  const handleNumericChange = React.useCallback(
-    (routineId: string, value: number) => {
-      // Immediate local update for responsive UI
-      setLocalNumericValues((prev) => ({ ...prev, [routineId]: value }));
-      // Debounced server update
-      debouncedNumericUpdate(routineId, value);
-    },
-    [debouncedNumericUpdate]
-  );
-
-  const loading = loadingRoutines || loadingProgress;
-
-  const handleDelete = async (id: string) => {
-    if (!confirm('Supprimer cette routine ?')) return;
-    
-    // Optimistic update
-    mutateRoutines(
-      (currentData: any[] | undefined) => {
-        if (!currentData) return currentData;
-        return currentData.filter((r) => r.id !== id);
-      },
-      false
+  const isToday = React.useMemo(() => {
+    const today = new Date();
+    return (
+      today.getFullYear() === selectedDate.getFullYear() &&
+      today.getMonth() === selectedDate.getMonth() &&
+      today.getDate() === selectedDate.getDate()
     );
+  }, [selectedDate]);
+
+  // Load routines once
+  React.useEffect(() => {
+    let mounted = true;
+    setLoading(true);
+
+    fetch('/api/routines')
+      .then((res) => res.json())
+      .then((data) => {
+        if (!mounted) return;
+        if (data?.error) {
+          setError(data.error);
+          setRoutines([]);
+        } else {
+          setRoutines(Array.isArray(data) ? data : []);
+        }
+      })
+      .catch(() => mounted && setError('Erreur lors du chargement'))
+      .finally(() => mounted && setLoading(false));
+
+    return () => { mounted = false; };
+  }, [userId]);
+
+  // Load progress when date changes
+  React.useEffect(() => {
+    if (routines.length === 0) {
+      setProgressByRoutine({});
+      return;
+    }
+
+    let mounted = true;
+    fetch(`/api/progress?date=${dateStr}`)
+      .then((res) => res.json())
+      .then((list) => {
+        if (!mounted || !Array.isArray(list)) return;
+        const map: Record<string, any> = {};
+        for (const p of list) {
+          if (p?.routineId) map[p.routineId] = p;
+        }
+        setProgressByRoutine(map);
+      })
+      .catch(console.error);
+
+    return () => { mounted = false; };
+  }, [routines.length, dateStr]);
+
+  // Optimistic toggle (boolean) - immediate UI + fire-and-forget request
+  const handleToggle = React.useCallback((routineId: string, value: boolean) => {
+    // Optimistic update
+    setProgressByRoutine((prev) => ({
+      ...prev,
+      [routineId]: { ...prev[routineId], booleanValue: value }
+    }));
+
+    // Fire request (no await needed for optimistic)
+    fetch('/api/progress', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ routineId, date: dateStr, booleanValue: value }),
+    }).catch(console.error);
+  }, [dateStr]);
+
+  // Debounced numeric update - immediate UI + debounced request
+  const handleNumericChange = React.useCallback((routineId: string, value: number) => {
+    // Immediate UI update
+    setProgressByRoutine((prev) => ({
+      ...prev,
+      [routineId]: { ...prev[routineId], numericValue: value }
+    }));
+
+    // Clear existing timer
+    if (debounceTimers.current[routineId]) {
+      clearTimeout(debounceTimers.current[routineId]);
+    }
+
+    // Debounced server sync (300ms)
+    debounceTimers.current[routineId] = setTimeout(() => {
+      fetch('/api/progress', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ routineId, date: dateStr, numericValue: value }),
+      }).catch(console.error);
+    }, 300);
+  }, [dateStr]);
+
+  // Optimistic delete
+  const handleDelete = React.useCallback(async (id: string) => {
+    if (!confirm('Supprimer cette routine ?')) return;
+
+    // Optimistic
+    setRoutines((prev) => prev.filter((r) => r.id !== id));
 
     try {
       const res = await fetch(`/api/routines/${id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('Erreur suppression');
-    } catch (err) {
-      console.error(err);
-      alert('Impossible de supprimer la routine');
-      mutateRoutines(); // Restore on error
+      if (!res.ok) throw new Error();
+    } catch {
+      // Rollback - refetch
+      const res = await fetch('/api/routines');
+      const data = await res.json();
+      if (Array.isArray(data)) setRoutines(data);
+      alert('Impossible de supprimer');
     }
-  };
+  }, []);
+
+  const reloadRoutines = React.useCallback(async () => {
+    const res = await fetch('/api/routines');
+    const data = await res.json();
+    if (Array.isArray(data)) setRoutines(data);
+  }, []);
 
   const isForDate = (r: any, targetDate: Date) => {
     try {
@@ -173,8 +185,7 @@ export default function RoutineList({ userId, date }: Props) {
     () => routines.filter((r) => isForDate(r, selectedDate)),
     [routines, selectedDate]
   );
-  
-  // Calculate completion using local numeric values for immediate feedback
+
   const completedCount = React.useMemo(() => {
     return todays.reduce((acc, r) => {
       const p = progressByRoutine[r.id];
@@ -182,29 +193,31 @@ export default function RoutineList({ userId, date }: Props) {
         return acc + (p?.booleanValue ? 1 : 0);
       }
       if (r.type === 'NUMERIC') {
-        // Use local value if available, otherwise server value
-        const numValue = localNumericValues[r.id] ?? p?.numericValue ?? 0;
-        return acc + (numValue >= (r.goal ?? 1) ? 1 : 0);
+        return acc + ((p?.numericValue ?? 0) >= (r.goal ?? 1) ? 1 : 0);
       }
       return acc;
     }, 0);
-  }, [todays, progressByRoutine, localNumericValues]);
+  }, [todays, progressByRoutine]);
 
   const progressPct = todays.length > 0 ? Math.round((completedCount / todays.length) * 100) : 0;
 
   return (
     <div className="w-full max-w-lg mx-auto">
       {/* Progress Header */}
-      <motion.div 
+      <motion.div
         className="flex items-center justify-between mb-3 sm:mb-4"
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
       >
         <div className="flex items-center gap-2">
           <Target className="w-4 h-4 sm:w-5 sm:h-5 text-accent" />
-          <h2 className="text-base sm:text-lg font-bold text-foreground">Aujourd&apos;hui</h2>
+          {isToday ? (
+            <h2 className="text-base sm:text-lg font-bold text-foreground">Aujourd&apos;hui</h2>
+          ) : (
+            <h2 className="text-base sm:text-lg font-bold text-foreground">{selectedDate.toLocaleDateString()}</h2>
+          )}
         </div>
-        <motion.div 
+        <motion.div
           className="flex items-center gap-1.5 sm:gap-2 bg-background-secondary px-2 sm:px-3 py-1 sm:py-1.5 rounded-full"
           animate={{ scale: completedCount === todays.length && todays.length > 0 ? [1, 1.1, 1] : 1 }}
         >
@@ -215,14 +228,14 @@ export default function RoutineList({ userId, date }: Props) {
 
       {/* Progress Bar */}
       {todays.length > 0 && (
-        <motion.div 
+        <motion.div
           className="mb-4 sm:mb-6"
           initial={{ opacity: 0, scaleX: 0 }}
           animate={{ opacity: 1, scaleX: 1 }}
           transition={{ delay: 0.1 }}
         >
           <div className="w-full bg-background-tertiary rounded-full h-2 sm:h-2.5 overflow-hidden">
-            <motion.div 
+            <motion.div
               className={`h-full rounded-full ${progressPct === 100 ? 'bg-success' : 'bg-accent'}`}
               initial={{ width: 0 }}
               animate={{ width: `${progressPct}%` }}
@@ -247,9 +260,9 @@ export default function RoutineList({ userId, date }: Props) {
           ))}
         </div>
       )}
-      
+
       {error && (
-        <motion.div 
+        <motion.div
           className="text-sm text-danger bg-danger-soft p-3 rounded-xl"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -261,14 +274,14 @@ export default function RoutineList({ userId, date }: Props) {
       <div className="flex flex-col gap-2 sm:gap-3">
         <AnimatePresence>
           {todays.length === 0 && !loading && (
-            <motion.div 
+            <motion.div
               className="text-center py-8 sm:py-12"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
             >
               <Target className="w-10 h-10 sm:w-12 sm:h-12 text-muted mx-auto mb-3" />
-              <p className="text-sm sm:text-base text-muted font-medium">Aucune routine pour aujourd&apos;hui</p>
+              <p className="text-sm sm:text-base text-muted font-medium">Aucune routine pour ce jour&apos;hui</p>
               <p className="text-xs sm:text-sm text-muted/60 mt-1">Appuie sur + pour en créer une</p>
             </motion.div>
           )}
@@ -276,9 +289,8 @@ export default function RoutineList({ userId, date }: Props) {
           {todays.map((r, index) => {
             const p = progressByRoutine[r.id];
             const toggled = r.type === 'BOOLEAN' ? Boolean(p?.booleanValue) : false;
-            // Use local value for immediate feedback, fall back to server value
-            const progress = r.type === 'NUMERIC' 
-              ? (localNumericValues[r.id] ?? p?.numericValue ?? 0) 
+            const progress = r.type === 'NUMERIC'
+              ? (p?.numericValue ?? 0)
               : (p?.booleanValue ? 1 : 0);
 
             return (
@@ -297,7 +309,7 @@ export default function RoutineList({ userId, date }: Props) {
                   goal={r.goal ?? 1}
                   toggled={toggled}
                   type={r.type}
-                  onToggle={(value) => updateProgress(r.id, { booleanValue: value })}
+                  onToggle={(value) => handleToggle(r.id, value)}
                   onNumericChange={(value) => handleNumericChange(r.id, value)}
                   onEdit={() => setEditingRoutine(r)}
                   onDelete={() => handleDelete(r.id)}
@@ -315,7 +327,7 @@ export default function RoutineList({ userId, date }: Props) {
             onClose={() => setEditingRoutine(null)}
             onCreated={() => {
               setEditingRoutine(null);
-              mutateRoutines();
+              reloadRoutines();
             }}
             initial={editingRoutine}
           />

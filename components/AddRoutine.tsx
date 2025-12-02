@@ -34,7 +34,7 @@ export default function AddRoutine({ open, onClose, onCreated, initial }: Props)
   const [name, setName] = useState("");
   const [icon, setIcon] = useState<string | null>(ICONS[0].key);
   const [tags, setTags] = useState<string[]>([]);
-  const [frequency, setFrequency] = useState<"DAILY" | "EVERY_N_DAYS" | "SPECIFIC_DAYS">("DAILY");
+  const [frequency, setFrequency] = useState<"DAILY" | "SPECIFIC_DAYS">("DAILY");
   const [everyNDays, setEveryNDays] = useState<number>(2);
   const [weekDays, setWeekDays] = useState<number[]>([]);
   const [goal, setGoal] = useState<number>(1);
@@ -73,7 +73,6 @@ export default function AddRoutine({ open, onClose, onCreated, initial }: Props)
         type: mode === "BOOLEAN" ? "BOOLEAN" : "NUMERIC",
         goal: mode === "NUMERIC" ? Math.max(1, Math.floor(goal)) : undefined,
         frequency: frequency,
-        everyNDays: frequency === "EVERY_N_DAYS" ? Math.max(1, Math.floor(everyNDays)) : undefined,
         weekDays: frequency === "SPECIFIC_DAYS" ? weekDays : undefined,
         tags,
       } as any;
@@ -215,13 +214,7 @@ export default function AddRoutine({ open, onClose, onCreated, initial }: Props)
               >
                 Quotidienne
               </motion.button>
-              <motion.button 
-                onClick={() => setFrequency("EVERY_N_DAYS")} 
-                className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium transition-colors ${frequency === "EVERY_N_DAYS" ? "bg-accent text-white" : "bg-background-secondary text-muted hover:bg-background-tertiary"}`}
-                whileTap={{ scale: 0.95 }}
-              >
-                Répétition
-              </motion.button>
+
               <motion.button 
                 onClick={() => setFrequency("SPECIFIC_DAYS")} 
                 className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium transition-colors ${frequency === "SPECIFIC_DAYS" ? "bg-accent text-white" : "bg-background-secondary text-muted hover:bg-background-tertiary"}`}
@@ -232,25 +225,6 @@ export default function AddRoutine({ open, onClose, onCreated, initial }: Props)
             </div>
 
             <AnimatePresence mode="wait">
-              {frequency === "EVERY_N_DAYS" && (
-                <motion.div 
-                  className="mt-2 sm:mt-3 flex items-center gap-2"
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                >
-                  <Input 
-                    type="number" 
-                    min={1} 
-                    max={7} 
-                    value={String(everyNDays ?? "")} 
-                    onChange={(e) => setEveryNDays(Number(e.target.value))}   
-                    className="w-16 sm:w-20 text-center text-sm"
-                  />
-                  <span className="text-xs sm:text-sm text-muted">par semaine</span>
-                </motion.div>
-              )}
-
               {frequency === "SPECIFIC_DAYS" && (
                 <motion.div 
                   className="mt-2 sm:mt-3 grid grid-cols-7 gap-1 sm:gap-2"
