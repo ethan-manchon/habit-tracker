@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default function RootLayout(props: any) {
   const { children, modal } = props as { children: React.ReactNode; modal?: React.ReactNode };
   return (
-    <html lang="fr">
+    <html lang="fr" suppressHydrationWarning>
       <body className={inter.className}>
         <Providers>{children}</Providers>
         {modal}

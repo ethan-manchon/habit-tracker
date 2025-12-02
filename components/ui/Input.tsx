@@ -1,6 +1,5 @@
 import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
-import { on } from "events";
 
 
 interface InputDataProps {
@@ -25,12 +24,12 @@ interface InputStyleProps {
 type InputProps = InputDataProps & InputStyleProps;
 
 const inputVariants = cva(
-  "flex w-full rounded-lg border bg-transparent px-4 py-3 transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50",
+  "flex w-full rounded-lg border bg-transparent px-4 py-3 transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50",
   {
     variants: {
       variant: {
-        default: "border-gray-700 bg-gray-900 text-white focus-visible:border-indigo-500 focus-visible:ring-indigo-500",
-        error: "border-red-500 bg-gray-900 text-white focus-visible:border-red-500 focus-visible:ring-red-500",
+        default: "border-input-border bg-input text-foreground focus-visible:border-accent focus-visible:ring-accent",
+        error: "border-danger bg-input text-foreground focus-visible:border-danger focus-visible:ring-danger",
       },
       inputSize: {
         default: "h-11 text-sm",
@@ -45,7 +44,7 @@ const inputVariants = cva(
   }
 );
 
-export default function Input({
+export function Input({
   variant = "default",
   inputSize = "default",
   autoFocus = false,

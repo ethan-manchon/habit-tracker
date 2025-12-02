@@ -1,7 +1,10 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import { motion } from "motion/react";
+import { ChevronLeft, ChevronRight } from "@/lib/Icon";
 
-const days = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
+const days = ["L", "M", "M", "J", "V", "S", "D"];
+const daysFull = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
 
 type Props = {
   selectedDate?: Date;
@@ -9,7 +12,6 @@ type Props = {
 };
 
 function startOfWeek(date: Date) {
-  // return Monday as start
   const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
   const day = d.getDay(); 
   const diff = (day + 6) % 7;
@@ -40,9 +42,7 @@ export default function Calendar({ selectedDate, onSelectDate }: Props) {
   const nextWeek = () => {
     const s = new Date(weekStart);
     s.setDate(s.getDate() + 7);
-    // compute start of current week for today
     const currentWeek = startOfWeek(todayStart);
-    // prevent going into future (weekStart cannot be after currentWeek)
     if (s.getTime() > currentWeek.getTime()) return;
     setWeekStart(s);
   };
@@ -61,6 +61,7 @@ export default function Calendar({ selectedDate, onSelectDate }: Props) {
   })();
 
   const isFuture = (d: Date) => d.getTime() > todayStart.getTime();
+  const isToday = (d: Date) => d.getTime() === todayStart.getTime();
 
   const handleSelect = (d: Date) => {
     if (isFuture(d)) return;
@@ -68,36 +69,77 @@ export default function Calendar({ selectedDate, onSelectDate }: Props) {
     if (onSelectDate) onSelectDate(new Date(d.getFullYear(), d.getMonth(), d.getDate()));
   };
 
+  const canGoNext = startOfWeek(todayStart).getTime() > weekStart.getTime();
+
   return (
-    <div className="w-full max-w-lg mx-auto bg-gray-900/60 rounded-xl p-4 shadow-md">
-
-      <div className="flex items-center justify-between text-gray-400 text-sm mb-3">
-        <button className="px-2 text-lg cursor-pointer" onClick={prevWeek} aria-label="Semaine précédente">‹</button>
-        <div>{rangeLabel}</div>
-        <button className={`px-2 text-lg cursor-pointer ${startOfWeek(todayStart).getTime() <= weekStart.getTime() ? "opacity-50 cursor-not-allowed" : ""}`} onClick={nextWeek} aria-label="Semaine suivante">›</button>
+    <motion.div 
+      className="w-full max-w-lg mx-auto bg-card border border-border rounded-2xl p-3 sm:p-4 shadow-sm"
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+    >
+      {/* Navigation */}
+      <div className="flex items-center justify-between mb-3 sm:mb-4">
+        <motion.button 
+          className="p-1.5 sm:p-2 rounded-xl hover:bg-background-secondary transition-colors"
+          onClick={prevWeek} 
+          aria-label="Semaine précédente"
+          whileTap={{ scale: 0.9 }}
+        >
+          <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 text-foreground" />
+        </motion.button>
+        
+        <span className="text-xs sm:text-sm font-semibold text-foreground">{rangeLabel}</span>
+        
+        <motion.button 
+          className={`p-1.5 sm:p-2 rounded-xl transition-colors ${canGoNext ? "hover:bg-background-secondary" : "opacity-30 cursor-not-allowed"}`}
+          onClick={nextWeek} 
+          aria-label="Semaine suivante"
+          whileTap={canGoNext ? { scale: 0.9 } : {}}
+          disabled={!canGoNext}
+        >
+          <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-foreground" />
+        </motion.button>
       </div>
-      <div className="flex px-8 items-center justify-between mb-3">
-        {days.map((d, i) => (
-          <div key={i} className="text-center text-xs text-gray-400 w-8">{d}</div>
-        ))}
-      </div>
 
-      <div className="flex px-8 items-center justify-between mb-3">
+      {/* Days */}
+      <div className="grid grid-cols-7 gap-1 sm:gap-2">
         {daysInWeek.map((d, i) => {
           const sel = d.getTime() === selected.getTime();
           const disabled = isFuture(d);
+          const todayDay = isToday(d);
+          
           return (
-            <button
+            <motion.button
               key={i}
               onClick={() => handleSelect(d)}
               disabled={disabled}
-              className={`w-8 h-8 rounded-lg cursor-pointer ${sel ? "bg-indigo-700 text-white ring-2 ring-indigo-500" : disabled ? "bg-gray-900/40 text-gray-600 cursor-not-allowed" : "bg-gray-800 text-gray-400"}`}
+              className="flex flex-col items-center gap-0.5 sm:gap-1 py-1.5 sm:py-2"
+              whileTap={!disabled ? { scale: 0.9 } : {}}
             >
-              {d.getDate()}
-            </button>
+              <span className={`text-[10px] sm:text-xs font-medium ${sel ? "text-accent" : "text-muted"}`}>
+                <span className="sm:hidden">{days[i]}</span>
+                <span className="hidden sm:inline">{daysFull[i]}</span>
+              </span>
+              <motion.div 
+                className={`w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center text-xs sm:text-sm font-bold transition-colors
+                  ${sel 
+                    ? "bg-accent text-white shadow-lg shadow-accent/30" 
+                    : disabled 
+                      ? "bg-transparent text-muted/40 cursor-not-allowed" 
+                      : todayDay
+                        ? "bg-accent/10 text-accent hover:bg-accent/20"
+                        : "bg-background-secondary text-foreground hover:bg-background-tertiary"
+                  }`}
+                animate={sel ? { scale: [1, 1.05, 1] } : {}}
+                transition={{ duration: 0.2 }}
+              >
+                {d.getDate()}
+              </motion.div>
+            </motion.button>
           );
         })}
       </div>
-    </div>
+    </motion.div>
   );
 }

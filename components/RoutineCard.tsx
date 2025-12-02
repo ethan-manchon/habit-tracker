@@ -1,6 +1,8 @@
 "use client";
 import React from "react";
-import Input from "./ui/Input";
+import { motion, AnimatePresence } from "motion/react";
+import { Input } from "@/components/ui/Input";
+import { Running, Book, Droplet, Dumbbell, Target, Flame, Sparkles, Heart, Briefcase, Gamepad, Check, Edit, Trash } from "@/lib/Icon";
 
 type Props = {
   icon?: React.ReactNode;
@@ -15,6 +17,19 @@ type Props = {
   onEdit?: () => void;
   onDelete?: () => void;
 };
+
+const ICONS = [
+  { key: "running", Icon: Running },
+  { key: "book", Icon: Book },
+  { key: "droplet", Icon: Droplet },
+  { key: "dumbbell", Icon: Dumbbell },
+  { key: "target", Icon: Target },
+  { key: "flame", Icon: Flame },
+  { key: "sparkles", Icon: Sparkles },
+  { key: "heart", Icon: Heart },
+  { key: "briefcase", Icon: Briefcase },
+  { key: "gamepad", Icon: Gamepad },
+];
 
 export default function RoutineCard({ icon, title, tags = [], progress = 0, goal = 1, toggled = false, onToggle, type, onNumericChange, onEdit, onDelete }: Props) {
   const pct = Math.min(100, Math.round((progress / Math.max(1, goal)) * 100));
@@ -49,33 +64,63 @@ export default function RoutineCard({ icon, title, tags = [], progress = 0, goal
     return () => window.removeEventListener('keydown', onKey);
   }, []);
 
+  const isCompleted = type === 'BOOLEAN' ? toggled : pct >= 100;
+
   return (
     <>
-      <div
+      <motion.div
         onContextMenu={onContextMenu}
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
-        className="bg-gray-900/60 rounded-xl p-4 shadow-md max-w-lg relative"
+        className={`bg-card border-2 ${isCompleted ? 'border-success/50' : 'border-border'} rounded-2xl p-3 sm:p-4 shadow-sm relative transition-colors`}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        whileHover={{ scale: 1.01 }}
+        whileTap={{ scale: 0.99 }}
+        layout
       >
-        <div className="flex items-start justify-between">
-          <div className="flex items-start gap-3">
-            <div className="text-2xl">{icon ?? "🏃"}</div>
-            <div>
-              <div className="text-sm text-gray-100 font-medium">{title}</div>
-              <div className="flex gap-2 mt-2">
-                {tags.map((t) => (
-                  <span key={t} className="text-xs bg-green-700 text-white px-2 py-0.5 rounded-full">{t}</span>
-                ))}
+        <div className="flex items-center justify-between gap-2 sm:gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+            <motion.div 
+              className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl ${isCompleted ? 'bg-success/20' : 'bg-accent/10'} flex items-center justify-center flex-shrink-0`}
+              animate={{ scale: isCompleted ? [1, 1.1, 1] : 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              {typeof icon === 'string'
+                ? (() => {
+                    const found = ICONS.find(({ key }) => key === icon);
+                    if (found) {
+                      const IconComp = found.Icon;
+                      return <IconComp className={`w-5 h-5 sm:w-6 sm:h-6 ${isCompleted ? 'text-success' : 'text-accent'}`} />;
+                    }
+                    return <span className="text-xl sm:text-2xl">{icon}</span>;
+                  })()
+                : icon
+                ? icon
+                : <Running className={`w-5 h-5 sm:w-6 sm:h-6 ${isCompleted ? 'text-success' : 'text-accent'}`} />}
+            </motion.div>
+            <div className="min-w-0 flex-1">
+              <div className={`text-sm sm:text-base font-semibold truncate ${isCompleted ? 'text-success line-through' : 'text-foreground'}`}>
+                {title}
               </div>
+              {tags.length > 0 && (
+                <div className="flex gap-1 mt-1 flex-wrap">
+                  {tags.map((t) => (
+                    <span key={t} className="text-[10px] sm:text-xs bg-accent/10 text-accent px-1.5 sm:px-2 py-0.5 rounded-full font-medium">
+                      {t}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
-          <div className="flex flex-col items-end gap-2">
+          <div className="flex flex-col items-end gap-2 flex-shrink-0">
             {type === 'NUMERIC' ? (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 sm:gap-2">
                 <Input
                   type="number"
-                  className="w-16 bg-gray-800 text-white rounded-md px-2 text-sm"
+                  className="w-12 sm:w-14 bg-input text-foreground rounded-lg px-2 text-xs sm:text-sm h-8"
                   value={String(progress ?? 0)}
                   onChange={(e) => {
                     const v = Number(e.target.value || 0);
@@ -83,77 +128,98 @@ export default function RoutineCard({ icon, title, tags = [], progress = 0, goal
                   }}
                   min={0} max={goal}
                 />
-                <div className="text-sm text-gray-300 whitespace-nowrap">/ {goal}</div>
+                <div className="text-xs sm:text-sm text-muted whitespace-nowrap">/ {goal}</div>
               </div>
             ) : (
-              <label className="inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="sr-only peer"
-                  checked={toggled}
-                  onChange={() => {
-                    if (onToggle) onToggle(!toggled);
-                  }}
-                />
-                <div className="relative w-9 h-5 bg-gray-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-brand-soft soft rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-buffer peer-checked:bg-green-700 after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-brand"></div>
-              </label>
+              <motion.button
+                onClick={() => onToggle && onToggle(!toggled)}
+                className={`w-8 h-8 sm:w-10 sm:h-10 rounded-xl border-2 flex items-center justify-center transition-colors ${
+                  toggled 
+                    ? 'bg-success border-success text-white' 
+                    : 'bg-transparent border-border hover:border-accent'
+                }`}
+                whileTap={{ scale: 0.9 }}
+              >
+                <AnimatePresence>
+                  {toggled && (
+                    <motion.div
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ scale: 0, opacity: 0 }}
+                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                    >
+                      <Check className="w-4 h-4 sm:w-5 sm:h-5" />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.button>
             )}
           </div>
         </div>
 
-        <div className="mt-4">
-          {type === 'NUMERIC' ? (<>
-            <div className="text-xs text-gray-400 mb-1">{progress} / {goal}</div>
-            <div className="w-full bg-gray-800 rounded-full h-2">
-              {pct < 50 ? (<div className="h-2 rounded-full bg-red-700" style={{ width: `${pct}%` }} />) 
-              : pct < 100 ? (<div className="h-2 rounded-full bg-yellow-700" style={{ width: `${pct}%` }} />)
-              : (<div className="h-2 rounded-full bg-green-700" style={{ width: `${pct}%` }} />)}
-
-              
-            </div>
-          </>
-          ) : null}
-        </div>
-      </div>
-
-      {showActions && menuPos && (
-        <div className="fixed inset-0 z-10">
-          {/* backdrop to close when clicking elsewhere */}
-          <div className="absolute inset-0" onClick={() => setShowActions(false)} onContextMenu={() => setShowActions(false)} />
-
-          {/* small popup positioned next to the click/tap */}
-          <div
-            className="absolute z-20"
-            style={{
-              left: `${menuPos.x}px`,
-              top: `${menuPos.y}px`,
-              transform: 'translate(0%, 12px)',
-              willChange: 'transform',
-            }}
-          >
-            <div className="bg-gray-800 rounded-md p-1 ">
-              <button
-                className="w-full text-left cursor-pointer px-3 py-2 rounded hover:bg-gray-700 text-white text-sm"
-                onClick={() => {
-                  setShowActions(false);
-                  if (onEdit) onEdit();
-                }}
-              >
-                Éditer
-              </button>
-              <button
-                className="w-full text-left px-3 cursor-pointer py-2 rounded hover:bg-red-500 text-red-100 text-sm mt-1 bg-red-600"
-                onClick={() => {
-                  setShowActions(false);
-                  if (onDelete) onDelete();
-                }}
-              >
-                Supprimer
-              </button>
+        {type === 'NUMERIC' && (
+          <div className="mt-3">
+            <div className="w-full bg-background-tertiary rounded-full h-2 sm:h-2.5 overflow-hidden">
+              <motion.div 
+                className={`h-full rounded-full ${pct < 50 ? 'bg-danger' : pct < 100 ? 'bg-warning' : 'bg-success'}`}
+                initial={{ width: 0 }}
+                animate={{ width: `${pct}%` }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+              />
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </motion.div>
+
+      <AnimatePresence>
+        {showActions && menuPos && (
+          <motion.div 
+            className="fixed inset-0 z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <div className="absolute inset-0 bg-overlay/50" onClick={() => setShowActions(false)} />
+
+            <motion.div
+              className="absolute z-50"
+              style={{
+                left: `${Math.min(menuPos.x, window.innerWidth - 160)}px`,
+                top: `${menuPos.y}px`,
+              }}
+              initial={{ opacity: 0, scale: 0.9, y: -10 }}
+              animate={{ opacity: 1, scale: 1, y: 12 }}
+              exit={{ opacity: 0, scale: 0.9, y: -10 }}
+              transition={{ type: "spring", stiffness: 500, damping: 30 }}
+            >
+              <div className="bg-card border border-border rounded-xl p-1.5 shadow-xl min-w-[140px]">
+                <motion.button
+                  className="w-full flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-background-secondary text-foreground text-sm font-medium"
+                  onClick={() => {
+                    setShowActions(false);
+                    if (onEdit) onEdit();
+                  }}
+                  whileHover={{ x: 2 }}
+                >
+                  <Edit className="w-4 h-4" />
+                  Éditer
+                </motion.button>
+                <motion.button
+                  className="w-full flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-danger/90 text-white text-sm font-medium mt-1 bg-danger"
+                  onClick={() => {
+                    setShowActions(false);
+                    if (onDelete) onDelete();
+                  }}
+                  whileHover={{ x: 2 }}
+                >
+                  <Trash className="w-4 h-4" />
+                  Supprimer
+                </motion.button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }

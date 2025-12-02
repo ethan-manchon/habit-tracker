@@ -18,10 +18,10 @@ const cardVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-gray-800 border-gray-700",
-        gradient: "bg-gradient-to-r from-indigo-600 to-purple-600 border-transparent",
-        glass: "bg-gray-800/50 backdrop-blur-sm border-gray-700",
-        outline: "bg-transparent border-gray-700",
+        default: "bg-card border-border text-card-foreground",
+        gradient: "bg-gradient-to-r from-indigo-600 to-purple-600 border-transparent text-white",
+        glass: "bg-card/50 backdrop-blur-sm border-border text-card-foreground",
+        outline: "bg-transparent border-border text-card-foreground",
       },
       padding: {
         none: "p-0",
@@ -37,7 +37,7 @@ const cardVariants = cva(
   }
 );
 
-export default function Card({
+export function Card({
   variant = "default",
   padding = "default",
   className,
@@ -60,7 +60,7 @@ export function CardHeader({ className, children }: { className?: string; childr
 
 export function CardTitle({ className, children }: { className?: string; children?: any }) {
   return (
-    <h3 className={cn("text-2xl font-semibold leading-none tracking-tight text-white", className)}>
+    <h3 className={cn("text-2xl font-semibold leading-none tracking-tight text-foreground", className)}>
       {children}
     </h3>
   );
@@ -68,7 +68,7 @@ export function CardTitle({ className, children }: { className?: string; childre
 
 export function CardDescription({ className, children }: { className?: string; children?: any }) {
   return (
-    <p className={cn("text-sm text-gray-400", className)}>
+    <p className={cn("text-sm text-muted", className)}>
       {children}
     </p>
   );

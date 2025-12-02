@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/auth";
+
+// Disable static caching for this dynamic route
+export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
   try {

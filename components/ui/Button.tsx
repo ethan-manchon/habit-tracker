@@ -18,16 +18,16 @@ interface ButtonStyleProps {
 type ButtonProps = ButtonDataProps & ButtonStyleProps;
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
-        default: "bg-indigo-600 text-white hover:bg-indigo-700 focus-visible:ring-indigo-500 cursor-pointer",
-        secondary: "bg-gray-800 text-white hover:bg-gray-700 border border-gray-700 focus-visible:ring-gray-500 cursor-pointer",
-        outline: "border border-gray-700 bg-transparent text-white hover:bg-gray-800 focus-visible:ring-gray-500 cursor-pointer",
-        ghost: "text-gray-400 hover:bg-gray-800 hover:text-white focus-visible:ring-gray-500 cursor-pointer",
-        gradient: "bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 focus-visible:ring-indigo-500 cursor-pointer",
-        danger: "bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-500 cursor-not-allowed",
+        default: "bg-accent text-white hover:bg-accent-hover focus-visible:ring-accent cursor-pointer",
+        secondary: "bg-background-secondary text-foreground hover:bg-background-tertiary border border-border focus-visible:ring-border cursor-pointer",
+        outline: "border border-border bg-transparent text-foreground hover:bg-background-secondary focus-visible:ring-border cursor-pointer",
+        ghost: "text-muted hover:bg-background-secondary hover:text-foreground focus-visible:ring-border cursor-pointer",
+        gradient: "bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 focus-visible:ring-accent cursor-pointer",
+        danger: "bg-danger text-white hover:bg-red-700 focus-visible:ring-danger cursor-pointer",
       },
       size: {
         default: "h-11 px-6 py-3 text-sm",
@@ -46,7 +46,7 @@ const buttonVariants = cva(
   }
 );
 
-export default function Button({
+export function Button({
   variant = "default",
   size = "default",
   fullWidth,

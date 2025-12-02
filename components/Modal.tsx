@@ -1,5 +1,6 @@
 "use client";
-import {useCallback, useRef, useEffect, MouseEventHandler} from "react";
+import { useCallback, useRef, useEffect, MouseEventHandler } from "react";
+import { motion, AnimatePresence } from "motion/react";
 
 export default function Modal({
   children,
@@ -39,19 +40,29 @@ export default function Modal({
   }, [onKeyDown]);
 
   return (
-    <div
-      ref={overlay}
-      className="fixed z-50 left-0 right-0 top-0 bottom-0 mx-auto bg-black/80 backdrop-blur-sm"
-      onClick={onClick}
-    >
-      <div
-        ref={wrapper}
-        className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md px-4 ${
-          className ? className : ""
-        }`}
+    <AnimatePresence>
+      <motion.div
+        ref={overlay}
+        className="fixed z-50 left-0 right-0 top-0 bottom-0 mx-auto bg-overlay backdrop-blur-sm"
+        onClick={onClick}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2 }}
       >
-        {children}
-      </div>
-    </div>
+        <motion.div
+          ref={wrapper}
+          className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md px-3 sm:px-4 ${
+            className ? className : ""
+          }`}
+          initial={{ opacity: 0, scale: 0.9, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.9, y: 20 }}
+          transition={{ type: "spring", damping: 25, stiffness: 300 }}
+        >
+          {children}
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
   );
 }

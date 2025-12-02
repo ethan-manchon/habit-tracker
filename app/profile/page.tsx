@@ -1,7 +1,9 @@
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/auth";
 import { redirect } from "next/navigation";
-import { Header, FooterNav, UserEdit } from "@/components";
+import Header from "@/components/Header";
+import FooterNav from "@/components/FooterNav";
+import UserEdit from "@/components/UserEdit";
 
 
 export default async function Home() {
@@ -12,8 +14,8 @@ export default async function Home() {
   }
 
     return (
-      <div className="mx-16">
-        <Header title="Profile" />
+      <div className="mx-3 sm:mx-6 md:mx-16">
+        <Header title="Profil" />
         <UserEdit />
         <FooterNav />
       </div>
