@@ -480,11 +480,6 @@ export default function ProfileContent() {
           </Modal>
         )}
       </AnimatePresence>
-      <div className="flex justify-center my-4">
-        <Button variant="default" onClick={() => setShowAllRoutines(true)}>
-          Voir toutes les routines
-        </Button>
-      </div>
       <AnimatePresence>
         {showAllRoutines && (
           <Modal onClose={() => setShowAllRoutines(false)}>
