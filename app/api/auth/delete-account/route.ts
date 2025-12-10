@@ -9,7 +9,7 @@ export async function DELETE(req: Request) {
   try {
     const session = (await getServerSession(authOptions as any)) as any;
     if (!session || !session.user?.id) {
-      return NextResponse.json({ error: "Unauthenticated" }, { status: 401 });
+      return NextResponse.json({ error: "Déconnecté" }, { status: 401 });
     }
 
     // Delete user (cascade will delete routines, progress, accounts, sessions)
@@ -20,6 +20,6 @@ export async function DELETE(req: Request) {
     return NextResponse.json({ ok: true });
   } catch (err: any) {
     console.error(err);
-    return NextResponse.json({ error: err?.message || "Server error" }, { status: 500 });
+    return NextResponse.json({ error: err?.message || "Erreur serveur" }, { status: 500 });
   }
 }

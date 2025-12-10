@@ -1,16 +1,40 @@
+/**
+ * @file Input.tsx
+ * @description Composant champ de saisie réutilisable avec icônes et variantes.
+ * 
+ * @usage
+ * ```tsx
+ * <Input placeholder="Email" icon={<MailIcon />} />
+ * <Input type="password" variant="error" iconRight={<EyeIcon />} />
+ * <Input inputSize="lg" />
+ * ```
+ * 
+ * @variants
+ * - default: Style standard avec bordure grise
+ * - error: Bordure rouge pour les erreurs de validation
+ * 
+ * @sizes
+ * - default: Taille standard (h-11)
+ * - sm: Petit (h-9)
+ * - lg: Grand (h-12)
+ * 
+ * @props
+ * - icon: Icône à gauche (non cliquable)
+ * - iconRight: Icône à droite (bouton cliquable)
+ */
+
 import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
-
 
 interface InputDataProps {
   type?: string;
   placeholder?: string;
   value?: string;
-  onChange?: (e: any) => void;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   disabled?: boolean;
-  icon?: any;
+  icon?: React.ReactNode;
   autoFocus?: boolean;
-  iconRight?: any;
+  iconRight?: React.ReactNode;
   min?: number;
   max?: number;
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
@@ -57,7 +81,6 @@ export function Input({
   iconRight,
   ...props
 }: InputProps) {
-
   return (
     <div className="relative w-full">
       {icon && (
@@ -76,7 +99,6 @@ export function Input({
           icon && "pl-10",
           iconRight && "pr-10",
           className
-
         )}
         autoFocus={autoFocus}
         {...props}

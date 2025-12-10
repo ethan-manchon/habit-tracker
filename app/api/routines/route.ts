@@ -10,7 +10,7 @@ export async function POST(req: Request) {
   try {
     const session = (await getServerSession(authOptions as any)) as any;
     if (!session || !session.user?.id) {
-      return NextResponse.json({ error: "Unauthenticated" }, { status: 401 });
+      return NextResponse.json({ error: "Déconnecté" }, { status: 401 });
     }
 
     const body = await req.json();
@@ -20,13 +20,12 @@ export async function POST(req: Request) {
       type,
       goal,
       frequency,
-      everyNDays,
       weekDays,
       tags = [],
     } = body;
 
     if (!name || typeof name !== "string") {
-      return NextResponse.json({ error: "Invalid name" }, { status: 400 });
+      return NextResponse.json({ error: "Nom invalide" }, { status: 400 });
     }
 
     // Prepare connectOrCreate for tags
@@ -40,7 +39,7 @@ export async function POST(req: Request) {
       console.error("Prisma client doesn't expose `routine` model:", prisma && Object.keys(prisma));
       return NextResponse.json({
         error:
-          "Prisma client missing 'routine' model. Try running 'npx prisma generate' and restart the dev server.",
+          "Erreur serveur",
       }, { status: 500 });
     }
 
@@ -52,7 +51,6 @@ export async function POST(req: Request) {
         type: type ?? undefined,
         goal: goal ?? null,
         frequency: frequency ?? undefined,
-        everyNDays: everyNDays ?? null,
         weekDays: weekDays ?? [],
         tags: { connectOrCreate: tagOps },
       },
@@ -62,7 +60,7 @@ export async function POST(req: Request) {
     return NextResponse.json(routine);
   } catch (err) {
     console.error(err);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }
 
@@ -70,7 +68,7 @@ export async function GET(req: Request) {
   try {
     const session = (await getServerSession(authOptions as any)) as any;
     if (!session || !session.user?.id) {
-      return NextResponse.json({ error: "Unauthenticated" }, { status: 401 });
+      return NextResponse.json({ error: "Déconnecté" }, { status: 401 });
     }
 
     const routines = await (prisma as any).routine.findMany({
@@ -82,6 +80,6 @@ export async function GET(req: Request) {
     return NextResponse.json(routines);
   } catch (err) {
     console.error(err);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }

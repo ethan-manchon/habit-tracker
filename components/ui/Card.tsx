@@ -1,8 +1,37 @@
+/**
+ * @file Card.tsx
+ * @description Composant carte réutilisable avec variantes de style.
+ * 
+ * @usage
+ * ```tsx
+ * <Card variant="default" padding="default">
+ *   <CardHeader>
+ *     <CardTitle>Titre</CardTitle>
+ *     <CardDescription>Description</CardDescription>
+ *   </CardHeader>
+ *   <CardContent>Contenu</CardContent>
+ *   <CardFooter>Actions</CardFooter>
+ * </Card>
+ * ```
+ * 
+ * @variants
+ * - default: Fond carte standard avec bordure
+ * - gradient: Dégradé indigo → violet (CTAs)
+ * - glass: Effet glassmorphism translucide
+ * - outline: Bordure visible, fond transparent
+ * 
+ * @padding
+ * - none: Pas de padding (p-0)
+ * - sm: Petit padding (p-4)
+ * - default: Padding standard (p-6)
+ * - lg: Grand padding (p-8)
+ */
+
 import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 interface CardDataProps {
-  children?: any;
+  children?: React.ReactNode;
 }
 
 interface CardStyleProps {
@@ -18,7 +47,7 @@ const cardVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-card border-border text-card-foreground",
+        default: "bg-card border-border text-card-foreground shadow-card",
         gradient: "bg-gradient-to-r from-indigo-600 to-purple-600 border-transparent text-white",
         glass: "bg-card/50 backdrop-blur-sm border-border text-card-foreground",
         outline: "bg-transparent border-border text-card-foreground",
@@ -50,7 +79,7 @@ export function Card({
   );
 }
 
-export function CardHeader({ className, children }: { className?: string; children?: any }) {
+export function CardHeader({ className, children }: { className?: string; children?: React.ReactNode }) {
   return (
     <div className={cn("flex flex-col space-y-1.5", className)}>
       {children}
@@ -58,7 +87,7 @@ export function CardHeader({ className, children }: { className?: string; childr
   );
 }
 
-export function CardTitle({ className, children }: { className?: string; children?: any }) {
+export function CardTitle({ className, children }: { className?: string; children?: React.ReactNode }) {
   return (
     <h3 className={cn("text-2xl font-semibold leading-none tracking-tight text-foreground", className)}>
       {children}
@@ -66,7 +95,7 @@ export function CardTitle({ className, children }: { className?: string; childre
   );
 }
 
-export function CardDescription({ className, children }: { className?: string; children?: any }) {
+export function CardDescription({ className, children }: { className?: string; children?: React.ReactNode }) {
   return (
     <p className={cn("text-sm text-muted", className)}>
       {children}
@@ -74,7 +103,7 @@ export function CardDescription({ className, children }: { className?: string; c
   );
 }
 
-export function CardContent({ className, children }: { className?: string; children?: any }) {
+export function CardContent({ className, children }: { className?: string; children?: React.ReactNode }) {
   return (
     <div className={cn("pt-0", className)}>
       {children}
@@ -82,7 +111,7 @@ export function CardContent({ className, children }: { className?: string; child
   );
 }
 
-export function CardFooter({ className, children }: { className?: string; children?: any }) {
+export function CardFooter({ className, children }: { className?: string; children?: React.ReactNode }) {
   return (
     <div className={cn("flex items-center pt-0", className)}>
       {children}

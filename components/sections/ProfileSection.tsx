@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { useTheme } from "next-themes";
 import Modal from "@/components/Modal";
-import Disconnected from "./ui/Disconnected";
+import Disconnected from "../ui/Disconnected";
 
 export default function ProfileContent() {
   const { data: session, update: updateSession } = useSession();
@@ -487,7 +487,7 @@ export default function ProfileContent() {
             <React.Suspense fallback={<div>Chargement...</div>}>
               {typeof window !== "undefined" && (
                 <>
-                  {React.createElement(require("./AllRoutinesModal").default, {
+                  {React.createElement(require("../AllRoutinesModal").default, {
                     open: true,
                     onClose: () => setShowAllRoutines(false),
                   })}

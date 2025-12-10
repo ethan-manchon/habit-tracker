@@ -10,7 +10,7 @@ export async function POST(req: Request) {
   try {
     const session = (await getServerSession(authOptions as any)) as any;
     if (!session || !session.user?.id) {
-      return NextResponse.json({ error: "Unauthenticated" }, { status: 401 });
+      return NextResponse.json({ error: "Déconnecté" }, { status: 401 });
     }
 
     const body = await req.json();
@@ -20,17 +20,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Les champs sont requis" }, { status: 400 });
     }
 
-    if (newPassword.length < 6) {
-      return NextResponse.json({ error: "Le mot de passe doit contenir au moins 6 caractères" }, { status: 400 });
-    }
-
     // Get current user with password
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
     });
 
     if (!user || !user.password) {
-      return NextResponse.json({ error: "Compte OAuth - pas de mot de passe à changer" }, { status: 400 });
+      return NextResponse.json({ error: "Compte non trouvé" }, { status: 400 });
     }
 
     // Verify current password

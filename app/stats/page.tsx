@@ -3,7 +3,7 @@ import { authOptions } from "@/app/auth";
 import { redirect } from "next/navigation";
 import Header from "@/components/Header";
 import FooterNav from "@/components/FooterNav";
-import StatsContent from "@/components/StatsContent";
+import StatsContent from "@/components/Content/StatsContent";
 import { Stats } from "@/lib/Icon";
 
 export default async function StatsPage() {

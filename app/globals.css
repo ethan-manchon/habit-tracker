@@ -107,3 +107,48 @@ button, [role="button"], a {
   cursor: pointer;
 }
 
+@layer utilities {
+  .text-2xs {
+    font-size: 0.625rem; /* 10px */
+    line-height: 0.875rem; /* 14px */
+  }
+  .max-h-modal { max-height: 85vh; }
+  .max-h-list { max-height: 70vh; }
+  .max-h-dropdown { max-height: 400px; }
+  .max-h-dropdown-lg { max-height: 500px; }
+
+  .min-w-nav-item { min-width: 60px; }
+  .min-w-context-menu { min-width: 140px; }
+
+  .w-cta-mobile { width: calc(100% - 1.5rem); }
+
+  .shadow-card {
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  }
+  .shadow-card-hover {
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  }
+  .shadow-dropdown {
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  }
+  .shadow-accent {
+    box-shadow: 0 10px 15px -3px rgb(99 102 241 / 0.3);
+  }
+  .animate-spin-slow {
+    animation: spin 1.5s linear infinite;
+  }
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  
+  /* Glass morphism effect */
+  .glass {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px);
+  }
+  
+  .dark .glass {
+    background: rgba(0, 0, 0, 0.2);
+  }
+}
+

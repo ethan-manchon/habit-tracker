@@ -1,3 +1,28 @@
+/**
+ * @file Icon.tsx
+ * @description Bibliothèque d'icônes SVG personnalisées.
+ * Toutes les icônes sont des composants React acceptant les props SVG standard.
+ * 
+ * @usage
+ * ```tsx
+ * import { Home, Check, User } from "@/lib/Icon";
+ * 
+ * <Home className="w-5 h-5 text-accent" />
+ * <Check className="w-4 h-4" />
+ * ```
+ * 
+ * @categories
+ * - Navigation: Home, Stats, User, ChevronLeft/Right/Down
+ * - Auth: Lock, Mail, ShowPassword, HiddenPassword
+ * - Actions: Plus, Check, CheckCircle, X, Edit, Trash
+ * - Theme: Sun, Moon
+ * - Routines: Running, Book, Droplet, Dumbbell, Target, Flame, Sparkles, Heart, Briefcase, Gamepad
+ * 
+ * @note
+ * N'utilisez PAS de bibliothèques d'icônes externes (lucide, heroicons, etc.).
+ * Ajoutez les nouvelles icônes dans ce fichier.
+ */
+
 import React from 'react';
 import type { SVGProps } from 'react';
 
@@ -150,15 +175,7 @@ export function ChevronDown(props: SVGProps<SVGSVGElement>) {
 export function Sun(props: SVGProps<SVGSVGElement>) {
     return (
         <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" {...props}>
-            <circle cx="12" cy="12" r="5" />
-            <line x1="12" y1="1" x2="12" y2="3" />
-            <line x1="12" y1="21" x2="12" y2="23" />
-            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-            <line x1="1" y1="12" x2="3" y2="12" />
-            <line x1="21" y1="12" x2="23" y2="12" />
-            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+            <circle cx="12" cy="12" r="5" /><line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" /><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" /><line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" /><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
         </svg>
     );
 }
@@ -211,9 +228,7 @@ export function Meditation(props: SVGProps<SVGSVGElement>) {
 export function Dumbbell(props: SVGProps<SVGSVGElement>) {
     return (
         <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" {...props}>
-            <path d="M6 4h2v16H6zM16 4h2v16h-2z" />
-            <path d="M3 8h3v8H3zM18 8h3v8h-3z" />
-            <path d="M8 11h8v2H8z" />
+            <path d="M6 4h2v16H6zM16 4h2v16h-2z" /><path d="M3 8h3v8H3zM18 8h3v8h-3z" /><path d="M8 11h8v2H8z" />
         </svg>
     );
 }
@@ -221,11 +236,7 @@ export function Dumbbell(props: SVGProps<SVGSVGElement>) {
 export function Palette(props: SVGProps<SVGSVGElement>) {
     return (
         <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" {...props}>
-            <circle cx="13.5" cy="6.5" r="1.5" />
-            <circle cx="17.5" cy="10.5" r="1.5" />
-            <circle cx="8.5" cy="7.5" r="1.5" />
-            <circle cx="6.5" cy="12.5" r="1.5" />
-            <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.555C21.965 6.012 17.461 2 12 2z" />
+            <circle cx="13.5" cy="6.5" r="1.5" /><circle cx="17.5" cy="10.5" r="1.5" /><circle cx="8.5" cy="7.5" r="1.5" /><circle cx="6.5" cy="12.5" r="1.5" /><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.555C21.965 6.012 17.461 2 12 2z" />
         </svg>
     );
 }
@@ -233,8 +244,7 @@ export function Palette(props: SVGProps<SVGSVGElement>) {
 export function Pencil(props: SVGProps<SVGSVGElement>) {
     return (
         <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" {...props}>
-            <line x1="18" y1="2" x2="22" y2="6" />
-            <path d="M7.5 20.5L19 9l-4-4L3.5 16.5 2 22z" />
+            <line x1="18" y1="2" x2="22" y2="6" /><path d="M7.5 20.5L19 9l-4-4L3.5 16.5 2 22z" />
         </svg>
     );
 }
@@ -242,9 +252,7 @@ export function Pencil(props: SVGProps<SVGSVGElement>) {
 export function Target(props: SVGProps<SVGSVGElement>) {
     return (
         <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" {...props}>
-            <circle cx="12" cy="12" r="10" />
-            <circle cx="12" cy="12" r="6" />
-            <circle cx="12" cy="12" r="2" />
+            <circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="12" r="2" />
         </svg>
     );
 }
@@ -252,11 +260,7 @@ export function Target(props: SVGProps<SVGSVGElement>) {
 export function Sprout(props: SVGProps<SVGSVGElement>) {
     return (
         <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" {...props}>
-            <path d="M7 20h10" />
-            <path d="M12 20v-8" />
-            <path d="M12 12c-3-3-7-3-7 1 5 0 7-1 7-1z" />
-            <path d="M12 12c3-3 7-3 7 1-5 0-7-1-7-1z" />
-            <path d="M12 8V4" />
+            <path d="M7 20h10" /><path d="M12 20v-8" /><path d="M12 12c-3-3-7-3-7 1 5 0 7-1 7-1z" /><path d="M12 12c3-3 7-3 7 1-5 0-7-1-7-1z" /><path d="M12 8V4" />
         </svg>
     );
 }
@@ -282,9 +286,7 @@ export function Sparkles(props: SVGProps<SVGSVGElement>) {
 export function LockClosed(props: SVGProps<SVGSVGElement>) {
     return (
         <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" {...props}>
-            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-            <circle cx="12" cy="16" r="1" />
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /><circle cx="12" cy="16" r="1" />
         </svg>
     );
 }
@@ -292,8 +294,7 @@ export function LockClosed(props: SVGProps<SVGSVGElement>) {
 export function Shield(props: SVGProps<SVGSVGElement>) {
     return (
         <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" {...props}>
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-            <path d="M9 12l2 2 4-4" />
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><path d="M9 12l2 2 4-4" />
         </svg>
     );
 }
@@ -331,12 +332,7 @@ export function Briefcase(props: SVGProps<SVGSVGElement>) {
 export function Gamepad(props: SVGProps<SVGSVGElement>) {
     return (
         <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" {...props}>
-            <line x1="6" y1="12" x2="10" y2="12" />
-            <line x1="8" y1="10" x2="8" y2="14" />
-            <line x1="15" y1="13" x2="15.01" y2="13" />
-            <line x1="18" y1="11" x2="18.01" y2="11" />
-            <rect x="2" y="6" width="20" height="12" rx="2" />
-        </svg>
+            <line x1="6" y1="12" x2="10" y2="12" /><line x1="8" y1="10" x2="8" y2="14" /><line x1="15" y1="13" x2="15.01" y2="13" /><line x1="18" y1="11" x2="18.01" y2="11" /><rect x="2" y="6" width="20" height="12" rx="2" /></svg>
     );
 }
 // Door

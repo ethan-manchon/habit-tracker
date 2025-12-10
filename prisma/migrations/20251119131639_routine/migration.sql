@@ -2,7 +2,7 @@
 CREATE TYPE "RoutineType" AS ENUM ('BOOLEAN', 'NUMERIC');
 
 -- CreateEnum
-CREATE TYPE "FrequencyType" AS ENUM ('DAILY', 'EVERY_N_DAYS', 'SPECIFIC_DAYS');
+CREATE TYPE "FrequencyType" AS ENUM ('DAILY', 'SPECIFIC_DAYS');
 
 -- DropIndex
 DROP INDEX "users_username_key";
@@ -16,7 +16,6 @@ CREATE TABLE "Routine" (
     "type" "RoutineType" NOT NULL DEFAULT 'BOOLEAN',
     "goal" INTEGER,
     "frequency" "FrequencyType" NOT NULL DEFAULT 'DAILY',
-    "everyNDays" INTEGER,
     "weekDays" INTEGER[],
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,

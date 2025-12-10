@@ -3,7 +3,7 @@ import { authOptions } from "@/app/auth";
 import { redirect } from "next/navigation";
 import Header from "@/components/Header";
 import FooterNav from "@/components/FooterNav";
-import ProfileContent from "@/components/ProfileContent";
+import ProfileSection from "@/components/Sections/ProfileSection";
 
 
 export default async function ProfilePage() {
@@ -16,7 +16,7 @@ export default async function ProfilePage() {
   return (
     <div className="mx-3 sm:mx-6 md:mx-16">
       <Header title="Profil" />
-      <ProfileContent />
+      <ProfileSection />
       <FooterNav />
     </div>
   );

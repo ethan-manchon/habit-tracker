@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import Header from "@/components/Header";
 import FooterNav from "@/components/FooterNav";
-import HomeContent from "@/components/HomeContent";
+import HomeSection from "@/components/sections/HomeSection";
 import { CheckCircle, Lock, Sparkles, Target } from "@/lib/Icon";
 
 export default async function Home() {
@@ -17,7 +17,7 @@ export default async function Home() {
       <div className="mx-3 sm:mx-6 md:mx-16">
         <Header title="Routines" />
         
-        <HomeContent/>
+        <HomeSection />
         
         <FooterNav />
       </div>
@@ -71,7 +71,7 @@ export default async function Home() {
         </div>
 
         {/* CTA Section */}
-        <Card variant="gradient" padding="sm" className="mb-4 fixed max-w-lg bottom-2 w-[calc(100%-1.5rem)] sm:w-full left-1/2 transform -translate-x-1/2 px-3 sm:px-4">
+        <Card variant="gradient" padding="sm" className="mb-4 fixed max-w-lg bottom-2 w-cta-mobile sm:w-full left-1/2 transform -translate-x-1/2 px-3 sm:px-4">
           <h3 className="text-base sm:text-lg md:text-xl font-semibold text-white mb-1.5 sm:mb-2 flex items-center justify-center gap-1.5 sm:gap-2">
             <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
             Enregistre ta progression
@@ -87,10 +87,11 @@ export default async function Home() {
         </Card>
 
         {/* Footer */}
-        <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 text-muted text-[10px] sm:text-xs md:text-sm pb-1 whitespace-nowrap">
+        <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 text-muted text-2xs sm:text-xs md:text-sm pb-1 whitespace-nowrap">
           <span>Gratuit</span> • <span>Sécurisé</span> • <span>Sans engagement</span>
         </div>
       </div>
     </div>
   );
 }
+

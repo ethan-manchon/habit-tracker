@@ -89,7 +89,6 @@ model Routine {
   type       RoutineType   @default(BOOLEAN)
   goal       Int?
   frequency  FrequencyType @default(DAILY)
-  everyNDays Int?
   weekDays   Int[]
   tags       Tag[]
   createdAt  DateTime      @default(now())

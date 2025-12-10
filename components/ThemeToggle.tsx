@@ -1,3 +1,17 @@
+/**
+ * @file ThemeToggle.tsx
+ * @description Bouton de bascule entre thème clair et sombre.
+ * 
+ * @usage
+ * ```tsx
+ * <ThemeToggle />
+ * ```
+ * 
+ * @features
+ * - Icône animée (rotation Soleil ↔ Lune)
+ * - Placeholder pendant le montage SSR
+ */
+
 "use client";
 
 import { useTheme } from "next-themes";

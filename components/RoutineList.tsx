@@ -1,3 +1,26 @@
+/**
+ * @file RoutineList.tsx
+ * @description Liste des routines avec gestion de la progression.
+ * Affiche les routines filtrées par date avec mise à jour optimiste.
+ * 
+ * @usage
+ * ```tsx
+ * <RoutineList date="2024-01-15" userId="user123" />
+ * ```
+ * 
+ * @features
+ * - Chargement automatique des routines et de la progression
+ * - Mise à jour optimiste pour les toggles (fire-and-forget)
+ * - Debounce de 300ms pour les valeurs numériques
+ * - Filtrage par jour selon la fréquence (DAILY, SPECIFIC_DAYS)
+ * - Barre de progression globale
+ * - Modal de confirmation pour la suppression
+ * 
+ * @state
+ * - routines: Liste des routines de l'utilisateur
+ * - progressByRoutine: Map de la progression par ID de routine
+ */
+
 "use client";
 import React from "react";
 import { motion, AnimatePresence } from "motion/react";
@@ -182,16 +205,6 @@ export default function RoutineList({ userId, date }: Props) {
         return Array.isArray(w) && w.includes(dayIdx);
       }
 
-      if (freq === 'EVERY_N_DAYS') {
-        const n = Number(r.everyNDays) || 0;
-        if (!n || !r.createdAt) return false;
-        const created = new Date(r.createdAt);
-        const t0 = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate()).getTime();
-        const c0 = new Date(created.getFullYear(), created.getMonth(), created.getDate()).getTime();
-        const days = Math.floor((t0 - c0) / (1000 * 60 * 60 * 24));
-        return days >= 0 && days % n === 0;
-      }
-
       return false;
     } catch (e) {
       return false;
@@ -219,7 +232,7 @@ export default function RoutineList({ userId, date }: Props) {
   const progressPct = todays.length > 0 ? Math.round((completedCount / todays.length) * 100) : 0;
 
   return (
-    <div className="w-full max-w-lg mx-auto max-h-[70vh] mb-24 overflow-auto">
+    <div className="w-full max-w-lg mx-auto max-h-list mb-24 overflow-auto">
       {/* Progress Header */}
       <motion.div
         className="flex items-center justify-between mb-3 sm:mb-4"

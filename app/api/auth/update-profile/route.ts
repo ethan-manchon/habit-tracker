@@ -49,6 +49,6 @@ export async function PATCH(req: Request) {
     });
   } catch (err: any) {
     console.error(err);
-    return NextResponse.json({ error: err?.message || "Server error" }, { status: 500 });
+    return NextResponse.json({ error: err?.message || "Erreur serveur" }, { status: 500 });
   }
 }

@@ -5,17 +5,6 @@ import { authOptions } from "@/app/auth";
 
 export const dynamic = "force-dynamic";
 
-function parseDateToMidnight(d: string) {
-  const parts = d.split("-");
-  if (parts.length >= 3) {
-    const y = Number(parts[0]);
-    const m = Number(parts[1]) - 1;
-    const day = Number(parts[2]);
-    return new Date(y, m, day);
-  }
-  return new Date(d);
-}
-
 function formatDateStr(d: Date) {
   const yyyy = d.getFullYear();
   const mm = String(d.getMonth() + 1).padStart(2, "0");
@@ -27,7 +16,7 @@ export async function GET(req: Request) {
   try {
     const session = (await getServerSession(authOptions as any)) as any;
     if (!session || !session.user?.id) {
-      return NextResponse.json({ error: "Unauthenticated" }, { status: 401 });
+      return NextResponse.json({ error: "Déconnecté" }, { status: 401 });
     }
 
     const url = new URL(req.url);
@@ -159,16 +148,6 @@ function isForDate(r: any, targetDate: Date) {
     if (freq === "SPECIFIC_DAYS") {
       const w = r.weekDays || [];
       return Array.isArray(w) && w.includes(dayIdx);
-    }
-
-    if (freq === "EVERY_N_DAYS") {
-      const n = Number(r.everyNDays) || 0;
-      if (!n || !r.createdAt) return false;
-      const created = new Date(r.createdAt);
-      const t0 = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate()).getTime();
-      const c0 = new Date(created.getFullYear(), created.getMonth(), created.getDate()).getTime();
-      const days = Math.floor((t0 - c0) / (1000 * 60 * 60 * 24));
-      return days >= 0 && days % n === 0;
     }
 
     return false;

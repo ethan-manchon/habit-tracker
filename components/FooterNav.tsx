@@ -1,3 +1,19 @@
+/**
+ * @file FooterNav.tsx
+ * @description Navigation fixe en bas de page pour les pages principales.
+ * Affiche les onglets Accueil, Stats et Profil.
+ * 
+ * @usage
+ * ```tsx
+ * <FooterNav />
+ * ```
+ * 
+ * @features
+ * - Détection automatique de la page active
+ * - Animation de l'indicateur de tab actif
+ * - Support safe-area-bottom pour iOS
+ */
+
 "use client";
 import React from "react";
 import Link from "next/link";
@@ -25,7 +41,7 @@ export default function FooterNav() {
             <Link 
               key={item.href} 
               href={item.href} 
-              className="relative flex flex-col items-center min-w-[60px] py-1"
+              className="relative flex flex-col items-center min-w-nav-item py-1"
             >
               <motion.div
                 className={`p-2 rounded-xl ${isActive ? "bg-accent/10" : ""}`}
@@ -36,7 +52,7 @@ export default function FooterNav() {
                   className={`w-5 h-5 sm:w-6 sm:h-6 ${isActive ? "text-accent" : "text-muted"}`} 
                 />
               </motion.div>
-              <span className={`text-[10px] sm:text-xs mt-0.5 font-medium ${isActive ? "text-accent" : "text-muted"}`}>
+              <span className={`text-2xs sm:text-xs mt-0.5 font-medium ${isActive ? "text-accent" : "text-muted"}`}>
                 {item.label}
               </span>
               {isActive && (

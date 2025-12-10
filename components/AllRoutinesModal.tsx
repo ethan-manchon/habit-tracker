@@ -1,9 +1,23 @@
+/**
+ * @file AllRoutinesModal.tsx
+ * @description Modal affichant toutes les routines de l'utilisateur.
+ * Permet d'éditer ou supprimer chaque routine.
+ * 
+ * @usage
+ * ```tsx
+ * <AllRoutinesModal open={isOpen} onClose={() => setOpen(false)} />
+ * ```
+ * 
+ * @features
+ * - Liste de toutes les routines avec icônes et tags
+ * - Boutons d'édition et suppression par routine
+ * - Animation d'entrée progressive des éléments
+ */
+
 "use client";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 
-import Modal from "./Modal";
-import RoutineCard from "./RoutineCard";
 import AddRoutine from "./AddRoutine";
 import { Button } from "./ui/Button";
 import { Book, Briefcase, Droplet, Dumbbell, Flame, Heart, Pencil, Running, Sparkles, Target, Trash } from "@/lib/Icon";
@@ -15,7 +29,6 @@ type Routine = {
     type?: "BOOLEAN" | "NUMERIC";
     goal?: number;
     frequency?: string;
-    everyNDays?: number;
     weekDays?: number[];
     tags?: { name: string }[];
 };
@@ -65,7 +78,7 @@ export default function AllRoutinesModal({ open, onClose }: Props) {
                     }}
                 />
             ) : (
-                <div className="border rounded-xl bg-background/60 max-h-[400px] sm:max-h-[500px] overflow-y-auto">
+                <div className="border rounded-xl bg-background/60 max-h-dropdown sm:max-h-dropdown-lg overflow-y-auto">
                     {routines.length === 0 ? (
                         <div className="text-muted text-center py-8">Aucune routine trouvée.</div>
                     ) : (

@@ -1,3 +1,25 @@
+/**
+ * @file AddRoutine.tsx
+ * @description Modal de création et modification de routine.
+ * 
+ * @usage
+ * ```tsx
+ * <AddRoutine
+ *   open={isOpen}
+ *   onClose={() => setOpen(false)}
+ *   onCreated={() => refreshList()}
+ *   initial={routineToEdit}  // optionnel, pour l'édition
+ * />
+ * ```
+ * 
+ * @features
+ * - Création et édition de routines
+ * - Choix du type (BOOLEAN ou NUMERIC)
+ * - Sélection d'icône parmi une liste prédéfinie
+ * - Tags prédéfinis sélectionnables
+ * - Fréquence (quotidien ou jours spécifiques)
+ */
+
 "use client";
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
@@ -35,7 +57,6 @@ export default function AddRoutine({ open, onClose, onCreated, initial }: Props)
   const [icon, setIcon] = useState<string | null>(ICONS[0].key);
   const [tags, setTags] = useState<string[]>([]);
   const [frequency, setFrequency] = useState<"DAILY" | "SPECIFIC_DAYS">("DAILY");
-  const [everyNDays, setEveryNDays] = useState<number>(2);
   const [weekDays, setWeekDays] = useState<number[]>([]);
   const [goal, setGoal] = useState<number>(1);
   const [loading, setLoading] = useState(false);
@@ -48,7 +69,6 @@ export default function AddRoutine({ open, onClose, onCreated, initial }: Props)
       setIcon(initial.icon ?? ICONS[0].key);
       setTags((initial.tags || []).map((t: any) => (t?.name ? t.name : t)));
       setFrequency(initial.frequency || 'DAILY');
-      setEveryNDays(initial.everyNDays ?? 2);
       setWeekDays(initial.weekDays || []);
       setGoal(initial.goal ?? 1);
     }
@@ -109,7 +129,6 @@ export default function AddRoutine({ open, onClose, onCreated, initial }: Props)
       setName("");
       setTags([]);
       setWeekDays([]);
-      setEveryNDays(2);
       setGoal(1);
       if (onCreated) onCreated();
       onClose();
@@ -125,7 +144,7 @@ export default function AddRoutine({ open, onClose, onCreated, initial }: Props)
 
   return (
     <Modal onClose={onClose}>
-      <Card className="max-h-[85vh] overflow-y-auto">
+      <Card className="max-h-modal overflow-y-auto">
         <CardHeader className="flex items-center justify-between p-3 sm:p-4">
           <h2 className="text-base sm:text-lg font-bold text-foreground">
             {initial?.id ? "Modifier la routine" : "Nouvelle routine"}

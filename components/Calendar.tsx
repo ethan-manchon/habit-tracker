@@ -1,3 +1,23 @@
+/**
+ * @file Calendar.tsx
+ * @description Calendrier hebdomadaire pour la sélection de dates.
+ * Affiche une semaine à la fois avec navigation.
+ * 
+ * @usage
+ * ```tsx
+ * <Calendar
+ *   selectedDate={new Date()}
+ *   onSelectDate={(date) => setSelectedDate(date)}
+ * />
+ * ```
+ * 
+ * @features
+ * - Navigation par semaine (précédent/suivant)
+ * - Désactivation des dates futures
+ * - Mise en évidence du jour actuel
+ * - Affichage responsive (L/M/M sur mobile, Lun/Mar/Mer sur desktop)
+ */
+
 "use client";
 import React, { useEffect, useState } from "react";
 import { motion } from "motion/react";
@@ -117,7 +137,7 @@ export default function Calendar({ selectedDate, onSelectDate }: Props) {
               className="flex flex-col items-center gap-0.5 sm:gap-1 py-1.5 sm:py-2"
               whileTap={!disabled ? { scale: 0.9 } : {}}
             >
-              <span className={`text-[10px] sm:text-xs font-medium ${sel ? "text-accent" : "text-muted"}`}>
+              <span className={`text-2xs sm:text-xs font-medium ${sel ? "text-accent" : "text-muted"}`}>
                 <span className="sm:hidden">{days[i]}</span>
                 <span className="hidden sm:inline">{daysFull[i]}</span>
               </span>

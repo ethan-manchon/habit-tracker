@@ -1,8 +1,34 @@
+/**
+ * @file Button.tsx
+ * @description Composant bouton réutilisable avec variantes de style.
+ * 
+ * @usage
+ * ```tsx
+ * <Button variant="default" size="default">Texte</Button>
+ * <Button variant="danger" size="sm" fullWidth>Supprimer</Button>
+ * <Button variant="ghost" size="icon"><Icon /></Button>
+ * ```
+ * 
+ * @variants
+ * - default: Bouton principal (accent color)
+ * - secondary: Bouton secondaire (fond gris)
+ * - outline: Bordure visible, fond transparent
+ * - ghost: Aucun fond, effet hover subtil
+ * - gradient: Dégradé indigo → violet
+ * - danger: Actions destructives (rouge)
+ * 
+ * @sizes
+ * - default: Taille standard (h-11)
+ * - sm: Petit (h-9)
+ * - lg: Grand (h-12)
+ * - icon: Carré pour icônes seules (h-10 w-10)
+ */
+
 import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 interface ButtonDataProps {
-  children?: any;
+  children?: React.ReactNode;
   type?: "button" | "submit" | "reset";
   onClick?: () => void;
   disabled?: boolean;

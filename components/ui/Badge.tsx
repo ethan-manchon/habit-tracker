@@ -1,8 +1,29 @@
+/**
+ * @file Badge.tsx
+ * @description Composant badge/tag réutilisable avec variantes de couleur.
+ * 
+ * @usage
+ * ```tsx
+ * <Badge variant="default">Nouveau</Badge>
+ * <Badge variant="success">Complété</Badge>
+ * <Badge variant="warning">En cours</Badge>
+ * <Badge variant="danger">Urgent</Badge>
+ * ```
+ * 
+ * @variants
+ * - default: Badge accent (indigo)
+ * - secondary: Badge neutre (gris)
+ * - success: Badge succès (vert)
+ * - warning: Badge attention (jaune)
+ * - danger: Badge erreur (rouge)
+ * - outline: Badge avec bordure, fond transparent
+ */
+
 import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 interface BadgeDataProps {
-  children?: any;
+  children?: React.ReactNode;
 }
 
 interface BadgeStyleProps {

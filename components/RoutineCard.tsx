@@ -1,3 +1,28 @@
+/**
+ * @file RoutineCard.tsx
+ * @description Carte représentant une routine individuelle.
+ * Supporte les types BOOLEAN (toggle) et NUMERIC (input numérique avec progression).
+ * 
+ * @usage
+ * ```tsx
+ * <RoutineCard
+ *   title="Faire du sport"
+ *   icon="running"
+ *   type="BOOLEAN"
+ *   toggled={isCompleted}
+ *   onToggle={(val) => setCompleted(val)}
+ *   onEdit={() => openEditModal()}
+ *   onDelete={() => handleDelete()}
+ * />
+ * ```
+ * 
+ * @features
+ * - Menu contextuel (clic droit ou appui long) pour éditer/supprimer
+ * - Animation de complétion avec changement de couleur
+ * - Barre de progression pour les routines numériques
+ * - Support des tags colorés
+ */
+
 "use client";
 import React from "react";
 import { motion, AnimatePresence } from "motion/react";
@@ -106,7 +131,7 @@ export default function RoutineCard({ icon, title, tags = [], progress = 0, goal
               {tags.length > 0 && (
                 <div className="flex gap-1 mt-1 flex-wrap">
                   {tags.map((t) => (
-                    <span key={t} className="text-[10px] sm:text-xs bg-accent/10 text-accent px-1.5 sm:px-2 py-0.5 rounded-full font-medium">
+                    <span key={t} className="text-2xs sm:text-xs bg-accent/10 text-accent px-1.5 sm:px-2 py-0.5 rounded-full font-medium">
                       {t}
                     </span>
                   ))}
@@ -192,7 +217,7 @@ export default function RoutineCard({ icon, title, tags = [], progress = 0, goal
               exit={{ opacity: 0, scale: 0.9, y: -10 }}
               transition={{ type: "spring", stiffness: 500, damping: 30 }}
             >
-              <div className="bg-card border border-border rounded-xl p-1.5 shadow-xl min-w-[140px]">
+              <div className="bg-card border border-border rounded-xl p-1.5 shadow-dropdown min-w-context-menu">
                 <motion.button
                   className="w-full flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-background-secondary text-foreground text-sm font-medium"
                   onClick={() => {

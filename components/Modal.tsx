@@ -1,3 +1,21 @@
+/**
+ * @file Modal.tsx
+ * @description Composant modal réutilisable avec overlay et animations.
+ * 
+ * @usage
+ * ```tsx
+ * <Modal onClose={() => setOpen(false)}>
+ *   <Card>Contenu du modal</Card>
+ * </Modal>
+ * ```
+ * 
+ * @features
+ * - Fermeture au clic sur l'overlay
+ * - Fermeture avec la touche Échap
+ * - Animation d'entrée/sortie avec motion
+ * - Backdrop blur
+ */
+
 "use client";
 import { useCallback, useRef, useEffect, MouseEventHandler } from "react";
 import { motion, AnimatePresence } from "motion/react";

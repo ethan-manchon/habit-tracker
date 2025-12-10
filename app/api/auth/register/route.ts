@@ -7,16 +7,16 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { email, password, pseudo } = body;
     if (!email || !password) {
-      return NextResponse.json({ error: "Email and password required" }, { status: 400 });
+      return NextResponse.json({ error: "Email et mot de passe requis" }, { status: 400 });
     }
 
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
-      return NextResponse.json({ error: "Email already in use" }, { status: 409 });
+      return NextResponse.json({ error: "Cet email est déjà utilisé" }, { status: 409 });
     }
 
     const hashed = await bcrypt.hash(password, 10);
-    const user = await prisma.user.create({
+    await prisma.user.create({
       data: {
         email,
         username: pseudo || null,
@@ -26,6 +26,6 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ ok: true });
   } catch (err: any) {
-    return NextResponse.json({ error: err?.message || "Server error" }, { status: 500 });
+    return NextResponse.json({ error: err?.message || "Erreur serveur" }, { status: 500 });
   }
 }

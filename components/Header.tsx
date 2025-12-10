@@ -1,3 +1,13 @@
+/**
+ * @file Header.tsx
+ * @description En-tête de page avec titre, toggle de thème et bouton de déconnexion.
+ * 
+ * @usage
+ * ```tsx
+ * <Header title="Routines" />
+ * ```
+ */
+
 "use client";
 import React from "react";
 import { motion } from "motion/react";

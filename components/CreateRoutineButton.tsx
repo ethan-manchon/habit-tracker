@@ -1,3 +1,18 @@
+/**
+ * @file CreateRoutineButton.tsx
+ * @description Bouton flottant pour créer une nouvelle routine.
+ * 
+ * @usage
+ * ```tsx
+ * <CreateRoutineButton onCreated={() => refreshRoutineList()} />
+ * ```
+ * 
+ * @features
+ * - Position fixe en bas à droite
+ * - Animation de rotation au hover
+ * - Ouvre le modal AddRoutine
+ */
+
 "use client";
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";

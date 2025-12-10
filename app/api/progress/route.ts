@@ -16,20 +16,20 @@ function parseDateToMidnight(d?: string) {
     const day = Number(parts[2]);
     return new Date(y, m, day);
   }
-  return new Date(d);
+  return new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
 }
 
 export async function POST(req: Request) {
   try {
     const session = (await getServerSession(authOptions as any)) as any;
     if (!session || !session.user?.id) {
-      return NextResponse.json({ error: "Unauthenticated" }, { status: 401 });
+      return NextResponse.json({ error: "Déconnecté" }, { status: 401 });
     }
 
     const body = await req.json();
     const { routineId, date, booleanValue, numericValue } = body;
 
-    if (!routineId) return NextResponse.json({ error: "Missing routineId" }, { status: 400 });
+    if (!routineId) return NextResponse.json({ error: "Routine manquante" }, { status: 400 });
 
     const day = parseDateToMidnight(date);
 
@@ -57,8 +57,6 @@ export async function POST(req: Request) {
         });
       }
     } else {
-      // Fallback to raw SQL if generated client doesn't expose progress model
-      console.warn("Prisma client missing 'progress' model, using raw SQL fallback");
       const dateIso = day.toISOString();
       const existingRows: any[] = await prisma.$queryRaw`
         SELECT * FROM "Progress"
@@ -91,7 +89,7 @@ export async function POST(req: Request) {
     return NextResponse.json(result);
   } catch (err) {
     console.error(err);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }
 
@@ -99,7 +97,7 @@ export async function GET(req: Request) {
   try {
     const session = (await getServerSession(authOptions as any)) as any;
     if (!session || !session.user?.id) {
-      return NextResponse.json({ error: "Unauthenticated" }, { status: 401 });
+      return NextResponse.json({ error: "Déconnecté" }, { status: 401 });
     }
 
     const url = new URL(req.url);
@@ -116,8 +114,6 @@ export async function GET(req: Request) {
       return NextResponse.json(list);
     }
 
-    // Fallback raw SQL
-    console.warn("Prisma client missing 'progress' model, using raw SQL fallback for GET");
     const dateIso = day.toISOString();
     const rows: any[] = await prisma.$queryRaw`
       SELECT * FROM "Progress"
@@ -127,6 +123,6 @@ export async function GET(req: Request) {
     return NextResponse.json(rows || []);
   } catch (err) {
     console.error(err);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }
