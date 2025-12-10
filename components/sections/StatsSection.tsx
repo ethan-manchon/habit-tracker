@@ -406,10 +406,16 @@ export default function StatsContent() {
       {/* Pagination dots */}
       <div className="absolute bottom-32 left-1/2 -translate-x-1/2 flex items-center gap-2">
         {[0, 1].map((i) => (
-          <span
+          <button
             key={i}
-            className={`w-2 h-2 rounded-full transition-all duration-200 ${activeSlide === i ? 'bg-accent' : 'bg-muted/40'}`}
-            style={{ display: 'inline-block' }}
+            onClick={() => {
+              setActiveSlide(i);
+              carouselRef.current?.scrollTo({
+          left: carouselRef.current.offsetWidth * i,
+          behavior: 'smooth',
+              });
+            }}
+            className={`w-4 h-4 rounded-full transition-all duration-200 ${activeSlide === i ? 'bg-accent' : 'bg-muted/40'}`}
           />
         ))}
       </div>

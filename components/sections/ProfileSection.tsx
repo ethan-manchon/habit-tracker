@@ -394,9 +394,6 @@ export default function ProfileContent() {
         </Card>
       </motion.div>
 
-      {/* Logout Button */}
-      <Disconnected />
-
       {/* Password Change Modal */}
       <AnimatePresence>
         {showPasswordModal && (
