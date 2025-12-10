@@ -16,7 +16,7 @@ export function ThemeToggle() {
   if (!mounted) {
     return (
       <button
-        className="p-2 rounded-xl bg-background-secondary hover:bg-background-tertiary transition-colors"
+        className="p-2 rounded-xl bg-background-secondary hover:bg-background-tertiary transition-colors cursor-pointer"
         aria-label="Changer de thème"
       >
         <span className="w-5 h-5 block" />
@@ -27,7 +27,7 @@ export function ThemeToggle() {
   return (
     <motion.button
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      className="p-2 rounded-xl bg-background-secondary hover:bg-background-tertiary transition-colors"
+      className="p-2 rounded-xl bg-background-secondary hover:bg-background-tertiary transition-colors cursor-pointer"
       aria-label="Changer de thème"
       whileTap={{ scale: 0.9 }}
       whileHover={{ scale: 1.05 }}

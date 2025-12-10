@@ -3,14 +3,16 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/auth";
 
-export async function PATCH(req: Request, ctx: any) {
+export const dynamic = "force-dynamic";
+
+export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }> }) {
   try {
     const session = (await getServerSession(authOptions as any)) as any;
     if (!session || !session.user?.id) {
       return NextResponse.json({ error: "Unauthenticated" }, { status: 401 });
     }
 
-    const id = ctx.params.id;
+    const { id } = await ctx.params;
     const body = await req.json();
     const { name, icon, type, goal, frequency, everyNDays, weekDays, tags } = body;
 
@@ -65,14 +67,14 @@ export async function PATCH(req: Request, ctx: any) {
   }
 }
 
-export async function DELETE(_req: Request, ctx: any) {
+export async function DELETE(_req: Request, ctx: { params: Promise<{ id: string }> }) {
   try {
     const session = (await getServerSession(authOptions as any)) as any;
     if (!session || !session.user?.id) {
       return NextResponse.json({ error: "Unauthenticated" }, { status: 401 });
     }
 
-    const id = ctx.params.id;
+    const { id } = await ctx.params;
     if (!prisma || !(prisma as any).routine) {
       return NextResponse.json({ error: "Prisma client missing 'routine' model" }, { status: 500 });
     }

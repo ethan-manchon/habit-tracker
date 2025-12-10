@@ -52,7 +52,7 @@ export default function Modal({
       >
         <motion.div
           ref={wrapper}
-          className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md px-3 sm:px-4 ${
+          className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md px-3 sm:px-4 pb-20 ${
             className ? className : ""
           }`}
           initial={{ opacity: 0, scale: 0.9, y: 20 }}

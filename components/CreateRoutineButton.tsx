@@ -4,14 +4,23 @@ import { motion, AnimatePresence } from "motion/react";
 import AddRoutine from "@/components/AddRoutine";
 import { Plus } from "@/lib/Icon";
 
-export default function CreateRoutineButton({ onClick }: { onClick?: () => void }) {
+export default function CreateRoutineButton({ onCreated }: { onCreated?: () => void }) {
   const [modal, setModal] = useState(false);
+
+  const handleCreated = () => {
+    setModal(false);
+    if (onCreated) onCreated();
+  };
 
   return (
     <>
       <AnimatePresence>
         {modal && (
-          <AddRoutine open={modal} onClose={() => setModal(false)} />
+          <AddRoutine 
+            open={modal} 
+            onClose={() => setModal(false)} 
+            onCreated={handleCreated}
+          />
         )}
       </AnimatePresence>
       

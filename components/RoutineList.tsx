@@ -3,6 +3,9 @@ import React from "react";
 import { motion, AnimatePresence } from "motion/react";
 import RoutineCard from "@/components/RoutineCard";
 import AddRoutine from "@/components/AddRoutine";
+import Modal from "@/components/Modal";
+import { Card, CardHeader, CardContent } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
 import { CheckCircle, Target } from "@/lib/Icon";
 
 type Props = {
@@ -23,6 +26,8 @@ export default function RoutineList({ userId, date }: Props) {
   const [error, setError] = React.useState<string | null>(null);
   const [progressByRoutine, setProgressByRoutine] = React.useState<Record<string, any>>({});
   const [editingRoutine, setEditingRoutine] = React.useState<any | null>(null);
+  const [pendingDeleteId, setPendingDeleteId] = React.useState<string | null>(null);
+  const [deleteError, setDeleteError] = React.useState<string | null>(null);
 
   // Debounce refs for numeric updates
   const debounceTimers = React.useRef<Record<string, NodeJS.Timeout>>({});
@@ -128,24 +133,36 @@ export default function RoutineList({ userId, date }: Props) {
     }, 300);
   }, [dateStr]);
 
-  // Optimistic delete
-  const handleDelete = React.useCallback(async (id: string) => {
-    if (!confirm('Supprimer cette routine ?')) return;
+  // Trigger delete confirmation modal
+  const handleDelete = React.useCallback((id: string) => {
+    setPendingDeleteId(id);
+  }, []);
 
+  const confirmDelete = React.useCallback(async () => {
+    if (!pendingDeleteId) return;
+    const id = pendingDeleteId;
     // Optimistic
     setRoutines((prev) => prev.filter((r) => r.id !== id));
+    setProgressByRoutine((prev) => {
+      const copy = { ...prev };
+      delete copy[id];
+      return copy;
+    });
 
     try {
       const res = await fetch(`/api/routines/${id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error();
-    } catch {
-      // Rollback - refetch
+      if (!res.ok) throw new Error('Erreur suppression');
+      setPendingDeleteId(null);
+    } catch (err: any) {
+      console.error(err);
+      // rollback
       const res = await fetch('/api/routines');
       const data = await res.json();
       if (Array.isArray(data)) setRoutines(data);
-      alert('Impossible de supprimer');
+      setDeleteError(err?.message || 'Impossible de supprimer la routine');
+      setPendingDeleteId(null);
     }
-  }, []);
+  }, [pendingDeleteId]);
 
   const reloadRoutines = React.useCallback(async () => {
     const res = await fetch('/api/routines');
@@ -202,7 +219,7 @@ export default function RoutineList({ userId, date }: Props) {
   const progressPct = todays.length > 0 ? Math.round((completedCount / todays.length) * 100) : 0;
 
   return (
-    <div className="w-full max-w-lg mx-auto">
+    <div className="w-full max-w-lg mx-auto max-h-[70vh] mb-24 overflow-auto">
       {/* Progress Header */}
       <motion.div
         className="flex items-center justify-between mb-3 sm:mb-4"
@@ -281,7 +298,7 @@ export default function RoutineList({ userId, date }: Props) {
               exit={{ opacity: 0, y: -20 }}
             >
               <Target className="w-10 h-10 sm:w-12 sm:h-12 text-muted mx-auto mb-3" />
-              <p className="text-sm sm:text-base text-muted font-medium">Aucune routine pour ce jour&apos;hui</p>
+              <p className="text-sm sm:text-base text-muted font-medium">Aucune routine pour ce jour</p>
               <p className="text-xs sm:text-sm text-muted/60 mt-1">Appuie sur + pour en créer une</p>
             </motion.div>
           )}
@@ -319,6 +336,41 @@ export default function RoutineList({ userId, date }: Props) {
           })}
         </AnimatePresence>
       </div>
+
+      {/* Delete confirmation modal */}
+      {pendingDeleteId && (
+        <Modal onClose={() => setPendingDeleteId(null)}>
+          <Card className="max-w-sm">
+            <CardHeader className="p-4 flex items-center justify-between">
+              <h3 className="text-lg font-bold">Supprimer la routine</h3>
+            </CardHeader>
+            <CardContent className="p-4">
+              <p className="text-sm text-foreground">Voulez-vous vraiment supprimer cette routine ? Cette action est irréversible.</p>
+              <div className="flex gap-2 justify-end mt-4">
+                <Button variant="ghost" onClick={() => setPendingDeleteId(null)}>Annuler</Button>
+                <Button variant="danger" onClick={confirmDelete}>Supprimer</Button>
+              </div>
+            </CardContent>
+          </Card>
+        </Modal>
+      )}
+
+      {/* Delete error modal */}
+      {deleteError && (
+        <Modal onClose={() => setDeleteError(null)}>
+          <Card className="max-w-sm">
+            <CardHeader className="p-4 flex items-center justify-between">
+              <h3 className="text-lg font-bold text-danger">Erreur</h3>
+            </CardHeader>
+            <CardContent className="p-4">
+              <p className="text-sm text-foreground">{deleteError}</p>
+              <div className="flex justify-end mt-4">
+                <Button onClick={() => setDeleteError(null)}>Fermer</Button>
+              </div>
+            </CardContent>
+          </Card>
+        </Modal>
+      )}
 
       <AnimatePresence>
         {editingRoutine && (

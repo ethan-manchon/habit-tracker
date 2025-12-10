@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import Header from "@/components/Header";
 import FooterNav from "@/components/FooterNav";
 import StatsContent from "@/components/StatsContent";
+import { Stats } from "@/lib/Icon";
 
 export default async function StatsPage() {
   const session = await getServerSession(authOptions as any);
@@ -18,5 +19,6 @@ export default async function StatsPage() {
       <StatsContent />
       <FooterNav />
     </div>
+
   );
 }

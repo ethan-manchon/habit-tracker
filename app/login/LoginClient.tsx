@@ -6,7 +6,7 @@ import { motion } from "motion/react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
-import { Lock, Mail, User, Google, CheckCircle } from "@/lib/Icon";
+import { Lock, Mail, User, CheckCircle } from "@/lib/Icon";
 
 export default function LoginClient() {
   const [activeTab, setActiveTab] = useState<"connexion" | "inscription">("connexion");
@@ -17,22 +17,16 @@ export default function LoginClient() {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [verifyLink, setVerifyLink] = useState("");
   const router = useRouter();
   const searchParams = useSearchParams();
 
   useEffect(() => {
     try {
       const err = searchParams?.get('error');
-      const verified = searchParams?.get('verified');
       if (err) {
         let msg = err;
-        if (err === 'OAuthAccountNotLinked') msg = 'Ce compte Google est déjà lié à un autre compte.';
-        if (err === 'Configuration') msg = 'Problème de configuration du provider.';
+        if (err === 'Configuration') msg = 'Problème de configuration.';
         setErrorMessage(msg);
-      }
-      if (verified) {
-        setSuccessMessage('Ton e‑mail a été vérifié — tu peux maintenant te connecter.');
       }
     } catch (e) {
       // ignore
@@ -118,7 +112,7 @@ export default function LoginClient() {
                   if (res?.error) {
                     const code = res.error;
                     if (code === 'CredentialsSignin') {
-                      setErrorMessage('Identifiants invalides. Vérifie ton email et mot de passe.');
+                      setErrorMessage('Identifiants invalides.');
                     } else {
                       setErrorMessage(res.error || 'Échec de la connexion');
                     }
@@ -153,12 +147,6 @@ export default function LoginClient() {
                 className="text-sm sm:text-base"
                 icon={<Lock className="w-4 h-4 sm:w-5 sm:h-5 text-muted" />}
               />
-
-              <div className="text-right">
-                <a href="#" className="text-xs sm:text-sm text-accent hover:text-accent-hover">
-                  Mot de passe oublié ?
-                </a>
-              </div>
 
               <Button type="submit" variant="default" fullWidth className="text-sm sm:text-base py-2 sm:py-2.5">
                 {loading ? (
@@ -203,14 +191,7 @@ export default function LoginClient() {
                   if (!resp.ok) {
                     setErrorMessage(data?.error || 'Erreur lors de l\'inscription');
                   } else {
-                    if (data?.emailed) {
-                      setSuccessMessage('Compte créé — un email de vérification a été envoyé.');
-                    } else if (data?.verifyUrl) {
-                      setSuccessMessage('Compte créé — verification link (local) :');
-                      setVerifyLink(data.verifyUrl);
-                    } else {
-                      setSuccessMessage('Compte créé — vérifie ton email pour activer le compte.');
-                    }
+                    setSuccessMessage('Compte créé ! Tu peux maintenant te connecter.');
                     setPassword('');
                     setConfirmPassword('');
                     setActiveTab('connexion');
@@ -291,32 +272,8 @@ export default function LoginClient() {
               </Button>
               {errorMessage && <p className="text-xs sm:text-sm text-danger pt-1 sm:pt-2">{errorMessage}</p>}
               {successMessage && <p className="text-xs sm:text-sm text-success pt-1 sm:pt-2">{successMessage}</p>}
-              {verifyLink && (
-                <p className="text-xs text-muted break-words mt-2">Lien de vérification : <a className="text-accent break-all" href={verifyLink} target="_blank" rel="noreferrer">{verifyLink}</a></p>
-              )}
             </motion.form>
           )}
-
-          <div className="relative my-4 sm:my-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-border"></div>
-            </div>
-            <div className="relative flex justify-center text-xs sm:text-sm">
-              <span className="px-2 bg-card text-muted">ou</span>
-            </div>
-          </div>
-
-          <motion.div whileTap={{ scale: 0.98 }}>
-            <Button
-              onClick={() => signIn("google", { callbackUrl: "/" })}
-              variant="secondary"
-              fullWidth
-              className="text-sm sm:text-base py-2 sm:py-2.5 flex items-center justify-center gap-2"
-            >
-              <Google className="w-4 h-4 sm:w-5 sm:h-5" />
-              Connexion avec Google
-            </Button>
-          </motion.div>
 
           <p className="text-[10px] sm:text-xs text-muted text-center mt-4 sm:mt-6">
             En continuant, tu acceptes nos conditions d&apos;utilisation.

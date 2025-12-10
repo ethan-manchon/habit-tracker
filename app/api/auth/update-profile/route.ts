@@ -13,7 +13,7 @@ export async function PATCH(req: Request) {
     }
 
     const body = await req.json();
-    const { name, email } = body;
+    const { username, email } = body;
 
     // Validate email format
     if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -34,7 +34,7 @@ export async function PATCH(req: Request) {
     const updatedUser = await prisma.user.update({
       where: { id: session.user.id },
       data: {
-        name: name || null,
+        username: username || null,
         email: email || session.user.email,
       },
     });
@@ -43,7 +43,7 @@ export async function PATCH(req: Request) {
       ok: true, 
       user: { 
         id: updatedUser.id, 
-        name: updatedUser.name, 
+        username: updatedUser.username, 
         email: updatedUser.email 
       } 
     });

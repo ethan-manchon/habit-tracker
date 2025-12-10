@@ -1,13 +1,14 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { useSession, signOut } from "next-auth/react";
-import { User, Mail, Lock, Edit, Check, X, Trash, Sun, Moon, ChevronRight, Shield } from "@/lib/Icon";
+import { User, Mail, Lock, Edit, Check, X, Trash, Sun, Moon, ChevronRight } from "@/lib/Icon";
 import { Card, CardHeader, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { useTheme } from "next-themes";
 import Modal from "@/components/Modal";
+import Disconnected from "./ui/Disconnected";
 
 export default function ProfileContent() {
   const { data: session, update: updateSession } = useSession();
@@ -16,7 +17,7 @@ export default function ProfileContent() {
 
   // Edit state
   const [isEditing, setIsEditing] = useState(false);
-  const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -38,13 +39,16 @@ export default function ProfileContent() {
   // Stats
   const [stats, setStats] = useState<{ totalRoutines: number; completedToday: number; streak: number } | null>(null);
 
+  // Modal routines
+  const [showAllRoutines, setShowAllRoutines] = useState(false);
+
   useEffect(() => {
     setMounted(true);
   }, []);
 
   useEffect(() => {
     if (session?.user) {
-      setName(session.user.name || "");
+      setUsername(session.user.name || "");
       setEmail(session.user.email || "");
     }
   }, [session]);
@@ -85,7 +89,7 @@ export default function ProfileContent() {
       const res = await fetch("/api/auth/update-profile", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email }),
+        body: JSON.stringify({ username, email }),
       });
 
       if (!res.ok) {
@@ -93,7 +97,7 @@ export default function ProfileContent() {
         throw new Error(data.error || "Erreur lors de la mise à jour");
       }
 
-      await updateSession({ name, email });
+      await updateSession({ name: username, email });
       setSuccess("Profil mis à jour !");
       setIsEditing(false);
     } catch (err: any) {
@@ -181,15 +185,7 @@ export default function ProfileContent() {
               className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-card border-4 border-card flex items-center justify-center mx-auto mb-3 shadow-lg"
               whileHover={{ scale: 1.05 }}
             >
-              {session?.user?.image ? (
-                <img 
-                  src={session.user.image} 
-                  alt="Avatar" 
-                  className="w-full h-full rounded-full object-cover"
-                />
-              ) : (
-                <User className="w-10 h-10 sm:w-12 sm:h-12 text-accent" />
-              )}
+              <User className="w-10 h-10 sm:w-12 sm:h-12 text-accent" />
             </motion.div>
 
             {/* User Info */}
@@ -203,9 +199,9 @@ export default function ProfileContent() {
             ) : (
               <div className="space-y-3 mb-4">
                 <Input
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Nom"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="Nom d'utilisateur"
                   icon={<User className="w-4 h-4 text-muted" />}
                 />
                 <Input
@@ -250,7 +246,7 @@ export default function ProfileContent() {
                     variant="ghost"
                     onClick={() => {
                       setIsEditing(false);
-                      setName(session?.user?.name || "");
+                      setUsername(session?.user?.name || "");
                       setEmail(session?.user?.email || "");
                     }}
                     className="flex items-center gap-1.5"
@@ -321,10 +317,23 @@ export default function ProfileContent() {
             </h3>
           </CardHeader>
           <CardContent className="p-2">
+            
+            {/* Voir toutes les routines */}
+            <motion.button
+              onClick={() => setShowAllRoutines(true)}
+              className="w-full flex items-center justify-between p-3 rounded-xl bg-gradient-to-r from-accent/10 to-purple-100 hover:from-accent/20 hover:to-purple-200 transition-colors mb-2 shadow"
+              whileTap={{ scale: 0.98 }}
+            >
+              <div className="flex items-center gap-3">
+                <Check className="w-5 h-5 text-accent" />
+                <span className="text-sm font-medium text-foreground">Voir toutes mes routines</span>
+              </div>
+              <ChevronRight className="w-4 h-4 text-accent" />
+            </motion.button>
             {/* Theme Toggle */}
             <motion.button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-background-secondary transition-colors"
+              className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-background-secondary transition-colors mb-2"
               whileTap={{ scale: 0.98 }}
             >
               <div className="flex items-center gap-3">
@@ -353,14 +362,6 @@ export default function ProfileContent() {
               <ChevronRight className="w-4 h-4 text-muted" />
             </motion.button>
 
-            {/* Security Info */}
-            <div className="flex items-center gap-3 p-3">
-              <Shield className="w-5 h-5 text-success" />
-              <div className="flex-1">
-                <span className="text-sm font-medium text-foreground">Compte vérifié</span>
-                <p className="text-xs text-muted">Email confirmé</p>
-              </div>
-            </div>
           </CardContent>
         </Card>
       </motion.div>
@@ -380,7 +381,7 @@ export default function ProfileContent() {
           <CardContent className="p-2">
             <motion.button
               onClick={() => setShowDeleteModal(true)}
-              className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-danger-soft transition-colors"
+              className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-danger-soft transition-colors cursor-pointer"
               whileTap={{ scale: 0.98 }}
             >
               <div className="flex items-center gap-3">
@@ -394,20 +395,7 @@ export default function ProfileContent() {
       </motion.div>
 
       {/* Logout Button */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-      >
-        <Button
-          variant="ghost"
-          fullWidth
-          onClick={() => signOut({ callbackUrl: "/" })}
-          className="text-danger hover:bg-danger-soft"
-        >
-          Se déconnecter
-        </Button>
-      </motion.div>
+      <Disconnected />
 
       {/* Password Change Modal */}
       <AnimatePresence>
@@ -416,9 +404,6 @@ export default function ProfileContent() {
             <Card className="w-full max-w-sm">
               <CardHeader className="p-4 flex items-center justify-between">
                 <h3 className="text-lg font-bold text-foreground">Changer le mot de passe</h3>
-                <motion.button onClick={() => setShowPasswordModal(false)} whileTap={{ scale: 0.9 }}>
-                  <X className="w-5 h-5 text-muted" />
-                </motion.button>
               </CardHeader>
               <CardContent className="p-4 pt-0 space-y-4">
                 <Input
@@ -444,9 +429,11 @@ export default function ProfileContent() {
                 )}
                 <div className="flex gap-2 justify-end">
                   <Button variant="ghost" onClick={() => setShowPasswordModal(false)}>
+                    <X className="w-4 h-4" />
                     Annuler
                   </Button>
                   <Button onClick={handlePasswordChange} disabled={passwordSaving}>
+                    <Check className="w-4 h-4" />
                     {passwordSaving ? "..." : "Confirmer"}
                   </Button>
                 </div>
@@ -469,12 +456,12 @@ export default function ProfileContent() {
                   Cette action est irréversible. Toutes vos routines et données seront supprimées.
                 </p>
                 <p className="text-sm text-foreground">
-                  Tapez <strong>SUPPRIMER</strong> pour confirmer :
+                  Tapez [<strong>SUPPRIMER</strong>] pour confirmer :
                 </p>
                 <Input
                   value={deleteConfirm}
                   onChange={(e) => setDeleteConfirm(e.target.value)}
-                  placeholder="SUPPRIMER"
+                  placeholder="Cette action est irréversible"
                 />
                 <div className="flex gap-2 justify-end">
                   <Button variant="ghost" onClick={() => setShowDeleteModal(false)}>
@@ -490,6 +477,28 @@ export default function ProfileContent() {
                 </div>
               </CardContent>
             </Card>
+          </Modal>
+        )}
+      </AnimatePresence>
+      <div className="flex justify-center my-4">
+        <Button variant="default" onClick={() => setShowAllRoutines(true)}>
+          Voir toutes les routines
+        </Button>
+      </div>
+      <AnimatePresence>
+        {showAllRoutines && (
+          <Modal onClose={() => setShowAllRoutines(false)}>
+            {/* Modal personnalisé pour la liste des routines */}
+            <React.Suspense fallback={<div>Chargement...</div>}>
+              {typeof window !== "undefined" && (
+                <>
+                  {React.createElement(require("./AllRoutinesModal").default, {
+                    open: true,
+                    onClose: () => setShowAllRoutines(false),
+                  })}
+                </>
+              )}
+            </React.Suspense>
           </Modal>
         )}
       </AnimatePresence>

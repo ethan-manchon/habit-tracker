@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import Header from "@/components/Header";
-import CreateRoutineButton from "@/components/CreateRoutineButton";
 import FooterNav from "@/components/FooterNav";
 import HomeContent from "@/components/HomeContent";
 import { CheckCircle, Lock, Sparkles, Target } from "@/lib/Icon";
@@ -16,11 +15,9 @@ export default async function Home() {
   if (session) {
     return (
       <div className="mx-3 sm:mx-6 md:mx-16">
-        <Header title="Mes ressources" />
+        <Header title="Routines" />
         
-        <HomeContent />
-       
-        <CreateRoutineButton />
+        <HomeContent/>
         
         <FooterNav />
       </div>

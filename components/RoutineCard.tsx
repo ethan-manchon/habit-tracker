@@ -185,7 +185,7 @@ export default function RoutineCard({ icon, title, tags = [], progress = 0, goal
               className="absolute z-50"
               style={{
                 left: `${Math.min(menuPos.x, window.innerWidth - 160)}px`,
-                top: `${menuPos.y}px`,
+                top: `${menuPos.y - 100}px`,
               }}
               initial={{ opacity: 0, scale: 0.9, y: -10 }}
               animate={{ opacity: 1, scale: 1, y: 12 }}

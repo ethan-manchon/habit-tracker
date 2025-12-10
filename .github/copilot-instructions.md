@@ -16,7 +16,7 @@ Mobile-first habit/routine tracking app. Next.js 16+ App Router, NextAuth v4 (JW
 ## Project Structure
 ```
 app/
-  auth.ts              # NextAuth config (Credentials + Google)
+  auth.ts              # NextAuth config (Credentials)
   providers.tsx        # SessionProvider + ThemeProvider wrapper
   page.tsx             # Main page (conditional render: auth vs landing)
   api/
@@ -67,7 +67,6 @@ npx prisma generate    # Regenerate client after schema edits
 ## Environment Variables Required
 ```
 NEXTAUTH_URL, NEXTAUTH_SECRET
-GOOGLE_CLIENT_ID, GOOGLE_SECRET_ID  # Optional for OAuth
 POSTGRES_PRISMA_URL, POSTGRES_URL_NON_POOLING
 ```
 

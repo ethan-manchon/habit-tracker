@@ -39,6 +39,7 @@ export default function AddRoutine({ open, onClose, onCreated, initial }: Props)
   const [weekDays, setWeekDays] = useState<number[]>([]);
   const [goal, setGoal] = useState<number>(1);
   const [loading, setLoading] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
 
   React.useEffect(() => {
     if (initial) {
@@ -61,11 +62,18 @@ export default function AddRoutine({ open, onClose, onCreated, initial }: Props)
 
   const toggleWeekDay = (d: number) => {
     setWeekDays((prev) => (prev.includes(d) ? prev.filter((x) => x !== d) : [...prev, d]));
+    setFormError(null);
   };
 
   const submit = async () => {
     if (!name.trim()) return alert("Donnez un nom à la routine");
     setLoading(true);
+    setFormError(null);
+    if (frequency === "SPECIFIC_DAYS" && (!Array.isArray(weekDays) || weekDays.length === 0)) {
+      setFormError("Sélectionnez au moins un jour pour la fréquence personnalisée");
+      setLoading(false);
+      return;
+    }
     try {
       const payload = {
         name: name.trim(),
@@ -122,13 +130,6 @@ export default function AddRoutine({ open, onClose, onCreated, initial }: Props)
           <h2 className="text-base sm:text-lg font-bold text-foreground">
             {initial?.id ? "Modifier la routine" : "Nouvelle routine"}
           </h2>
-          <motion.button
-            onClick={onClose}
-            className="p-1.5 rounded-lg hover:bg-background-secondary transition-colors"
-            whileTap={{ scale: 0.9 }}
-          >
-            <X className="w-5 h-5 text-muted" />
-          </motion.button>
         </CardHeader>
 
         <CardContent className="p-3 sm:p-4 pt-0 space-y-4 sm:space-y-5">
@@ -139,6 +140,8 @@ export default function AddRoutine({ open, onClose, onCreated, initial }: Props)
             </label>
             <Input 
               placeholder="Ex: Faire du sport" 
+              min={2}
+              max={12 }
               value={name} 
               onChange={(e) => setName(e.target.value)}
               className="text-sm sm:text-base"
@@ -204,7 +207,6 @@ export default function AddRoutine({ open, onClose, onCreated, initial }: Props)
           </div>
 
           {/* Frequency */}
-          <div>
             <label className="text-xs sm:text-sm font-medium text-foreground mb-1.5 block">Fréquence</label>
             <div className="flex flex-wrap gap-1.5 sm:gap-2">
               <motion.button 
@@ -245,7 +247,10 @@ export default function AddRoutine({ open, onClose, onCreated, initial }: Props)
                 </motion.div>
               )}
             </AnimatePresence>
-          </div>
+
+            {formError && (
+              <p className="text-sm text-danger mt-2">{formError}</p>
+            )}
 
           {/* Goal (Numeric mode) */}
           <AnimatePresence>
@@ -271,13 +276,13 @@ export default function AddRoutine({ open, onClose, onCreated, initial }: Props)
           </AnimatePresence>
 
           {/* Actions */}
-          <div className="flex items-center justify-end gap-2 sm:gap-3 pt-2 sm:pt-4 border-t border-border">
+            <div className="flex items-center justify-end gap-2 sm:gap-3 pt-2 sm:pt-4 border-t border-border">
             <Button variant="ghost" onClick={onClose} className="text-xs sm:text-sm px-3 sm:px-4">
               Annuler
             </Button>
             <Button 
               onClick={submit} 
-              disabled={loading}
+              disabled={loading || (frequency === "SPECIFIC_DAYS" && (!Array.isArray(weekDays) || weekDays.length === 0))}
               className="text-xs sm:text-sm px-3 sm:px-4 flex items-center gap-1.5"
             >
               {loading ? (

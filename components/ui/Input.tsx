@@ -13,6 +13,7 @@ interface InputDataProps {
   iconRight?: any;
   min?: number;
   max?: number;
+  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
 }
 
 interface InputStyleProps {
@@ -68,6 +69,8 @@ export function Input({
         type={type}
         min={min}
         max={max}
+        minLength={min}
+        maxLength={max}
         className={cn(
           inputVariants({ variant, inputSize }),
           icon && "pl-10",

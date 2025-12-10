@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { motion } from "motion/react";
 import {
   BarChart,
@@ -15,7 +15,7 @@ import {
   ReferenceLine,
 } from "recharts";
 import { Card, CardHeader, CardContent } from "@/components/ui/Card";
-import { Stats, Target, ChevronDown } from "@/lib/Icon";
+import { Target, ChevronDown } from "@/lib/Icon";
 
 type DailyData = {
   date: string;
@@ -51,6 +51,23 @@ const PERIOD_OPTIONS = [
 ];
 
 export default function StatsContent() {
+  // Carrousel: état de la slide active
+  const [activeSlide, setActiveSlide] = useState(0);
+  const carouselRef = useRef<HTMLDivElement>(null);
+
+  // Gère le scroll pour détecter la slide active
+  useEffect(() => {
+    const el = carouselRef.current;
+    if (!el) return;
+    const onScroll = () => {
+      const scrollLeft = el.scrollLeft;
+      const width = el.offsetWidth;
+      const slide = Math.round(scrollLeft / width);
+      setActiveSlide(slide);
+    };
+    el.addEventListener('scroll', onScroll);
+    return () => el.removeEventListener('scroll', onScroll);
+  }, []);
   const [days, setDays] = useState(7);
   const [selectedRoutineId, setSelectedRoutineId] = useState<string | null>(null);
   const [data, setData] = useState<StatsResponse | null>(null);
@@ -103,7 +120,7 @@ export default function StatsContent() {
   // Prepare routine-specific chart data
   const routineChartData = useMemo(() => {
     if (!data?.routineData || !data.selectedRoutine) return [];
-    
+
     return data.routineData.map((d) => ({
       ...d,
       dateShort: formatDateShort(d.date),
@@ -128,43 +145,25 @@ export default function StatsContent() {
     muted: "var(--muted)",
     border: "var(--border)",
     foreground: "var(--foreground)",
-    card: "var(--card)",
+    card: "var(--card)"
   };
-
-  if (loading && !data) {
-    return (
-      <div className="w-full max-w-2xl mx-auto space-y-4 sm:space-y-6">
-        <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-background-secondary rounded w-1/3" />
-          <div className="h-64 bg-background-secondary rounded-2xl" />
-          <div className="h-64 bg-background-secondary rounded-2xl" />
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="w-full max-w-2xl mx-auto space-y-4 sm:space-y-6 pb-24">
+    <div className="w-full max-w-lg mx-auto pb-24">
       {/* Period Selector */}
       <motion.div
-        className="flex items-center justify-between"
+        className="flex items-center justify-between mb-4"
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <div className="flex items-center gap-2">
-          <Stats className="w-5 h-5 text-accent" />
-          <h2 className="text-base sm:text-lg font-bold text-foreground">Statistiques</h2>
-        </div>
         <div className="flex gap-1 sm:gap-2 bg-background-secondary rounded-xl p-1">
           {PERIOD_OPTIONS.map((opt) => (
             <motion.button
               key={opt.value}
               onClick={() => setDays(opt.value)}
-              className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
-                days === opt.value
-                  ? "bg-card text-foreground shadow-sm"
-                  : "text-muted hover:text-foreground"
-              }`}
+              className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors ${days === opt.value
+                ? "bg-card text-foreground shadow-sm"
+                : "text-muted hover:text-foreground"
+                }`}
               whileTap={{ scale: 0.95 }}
             >
               {opt.label}
@@ -173,253 +172,247 @@ export default function StatsContent() {
         </div>
       </motion.div>
 
-      {/* Average completion badge */}
-      <motion.div
-        className="flex items-center gap-3 bg-accent/10 rounded-xl px-4 py-3"
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.1 }}
+      {/* Carrousel horizontal */}
+      <div
+        ref={carouselRef}
+        className="relative w-full overflow-x-auto flex gap-6 snap-x snap-mandatory pb-8"
+        style={{ WebkitOverflowScrolling: 'touch', scrollSnapType: 'x mandatory', scrollBehavior: 'smooth' }}
       >
-        <Target className="w-6 h-6 text-accent" />
-        <div>
-          <p className="text-xs text-muted">Complétion moyenne</p>
-          <p className="text-xl sm:text-2xl font-bold text-accent">{avgCompletion}%</p>
-        </div>
-      </motion.div>
-
-      {/* Daily Completion Bar Chart */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-      >
-        <Card>
-          <CardHeader className="p-4">
-            <h3 className="text-sm sm:text-base font-semibold text-foreground">
-              Routines complétées par jour
-            </h3>
-          </CardHeader>
-          <CardContent className="p-2 sm:p-4 pt-0">
-            <div className="h-48 sm:h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={barChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke={chartColors.border} vertical={false} />
-                  <XAxis
-                    dataKey="dateShort"
-                    tick={{ fontSize: 10, fill: chartColors.muted }}
-                    tickLine={false}
-                    axisLine={{ stroke: chartColors.border }}
-                  />
-                  <YAxis
-                    tick={{ fontSize: 10, fill: chartColors.muted }}
-                    tickLine={false}
-                    axisLine={false}
-                    allowDecimals={false}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: chartColors.card,
-                      border: `1px solid ${chartColors.border}`,
-                      borderRadius: "12px",
-                      fontSize: "12px",
-                    }}
-                    labelStyle={{ color: chartColors.foreground, fontWeight: 600 }}
-                    formatter={(value: number, name: string) => {
-                      if (name === "completed") return [value, "Complétées"];
-                      return [value, name];
-                    }}
-                    labelFormatter={(label) => `Date: ${label}`}
-                  />
-                  <Bar dataKey="completed" radius={[6, 6, 0, 0]} maxBarSize={40}>
-                    {barChartData.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={
-                          entry.completed === entry.total && entry.total > 0
-                            ? chartColors.success
-                            : chartColors.accent
-                        }
-                      />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
+        {/* Slide 1: Complétion moyenne + BarChart */}
+        <div className="min-w-full max-w-lg snap-center flex-shrink-0">
+          <motion.div
+            className="flex items-center gap-3 bg-accent/10 rounded-xl px-4 py-3 mb-4"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.1 }}
+          >
+            <Target className="w-6 h-6 text-accent" />
+            <div>
+              <p className="text-xs text-muted">Complétion moyenne</p>
+              <p className="text-xl sm:text-2xl font-bold text-accent">{avgCompletion}%</p>
             </div>
-          </CardContent>
-        </Card>
-      </motion.div>
-
-      {/* Routine Selector & Detail Chart */}
-      {data?.routines && data.routines.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
+          </motion.div>
           <Card>
             <CardHeader className="p-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm sm:text-base font-semibold text-foreground">
-                  Détail par routine
-                </h3>
-                {/* Routine Select Dropdown */}
-                <div className="relative">
-                  <select
-                    value={selectedRoutineId || ""}
-                    onChange={(e) => setSelectedRoutineId(e.target.value)}
-                    className="appearance-none bg-background-secondary border border-border rounded-xl px-3 py-1.5 pr-8 text-xs sm:text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-accent cursor-pointer"
-                  >
-                    {data.routines.map((routine) => (
-                      <option key={routine.id} value={routine.id}>
-                        {routine.name}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-muted pointer-events-none" />
-                </div>
-              </div>
-              {data.selectedRoutine && (
-                <p className="text-xs text-muted mt-1">
-                  Type: {data.selectedRoutine.type === "BOOLEAN" ? "Oui/Non" : "Numérique"}
-                  {data.selectedRoutine.type === "NUMERIC" &&
-                    data.selectedRoutine.goal &&
-                    ` • Objectif: ${data.selectedRoutine.goal}`}
-                </p>
-              )}
+              <h3 className="text-sm sm:text-base font-semibold text-foreground">
+                Routines complétées par jour
+              </h3>
             </CardHeader>
             <CardContent className="p-2 sm:p-4 pt-0">
               <div className="h-48 sm:h-64">
-                {data.selectedRoutine?.type === "NUMERIC" ? (
-                  /* Numeric routine: Line chart with dots */
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart
-                      data={routineChartData}
-                      margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" stroke={chartColors.border} vertical={false} />
-                      <XAxis
-                        dataKey="dateShort"
-                        tick={{ fontSize: 10, fill: chartColors.muted }}
-                        tickLine={false}
-                        axisLine={{ stroke: chartColors.border }}
-                      />
-                      <YAxis
-                        tick={{ fontSize: 10, fill: chartColors.muted }}
-                        tickLine={false}
-                        axisLine={false}
-                        allowDecimals={false}
-                      />
-                      {data.selectedRoutine.goal && (
-                        <ReferenceLine
-                          y={data.selectedRoutine.goal}
-                          stroke={chartColors.success}
-                          strokeDasharray="5 5"
-                          label={{
-                            value: `Objectif: ${data.selectedRoutine.goal}`,
-                            position: "right",
-                            fontSize: 10,
-                            fill: chartColors.success,
-                          }}
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={barChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke={chartColors.border} vertical={false} />
+                    <XAxis
+                      dataKey="dateShort"
+                      tick={{ fontSize: 10, fill: chartColors.muted }}
+                      tickLine={false}
+                      axisLine={{ stroke: chartColors.border }}
+                    />
+                    <YAxis
+                      tick={{ fontSize: 10, fill: chartColors.muted }}
+                      tickLine={false}
+                      axisLine={false}
+                      allowDecimals={false}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: chartColors.card,
+                        border: `1px solid ${chartColors.border}`,
+                        borderRadius: "12px",
+                        fontSize: "12px",
+                      }}
+                      labelStyle={{ color: chartColors.foreground, fontWeight: 600 }}
+                      formatter={(value: number, name: string) => {
+                        if (name === "completed") return [value, "Complétées"];
+                        return [value, name];
+                      }}
+                      labelFormatter={(label) => `Date: ${label}`}
+                    />
+                    <Bar dataKey="completed" radius={[6, 6, 0, 0]} maxBarSize={40}>
+                      {barChartData.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={
+                            entry.completed === entry.total && entry.total > 0
+                              ? chartColors.success
+                              : chartColors.accent
+                          }
                         />
-                      )}
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: chartColors.card,
-                          border: `1px solid ${chartColors.border}`,
-                          borderRadius: "12px",
-                          fontSize: "12px",
-                        }}
-                        labelStyle={{ color: chartColors.foreground, fontWeight: 600 }}
-                        formatter={(value: any) => [
-                          value !== null && value !== undefined ? value : "—",
-                          "Valeur",
-                        ]}
-                        labelFormatter={(label) => `Date: ${label}`}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="numericValue"
-                        stroke={chartColors.accent}
-                        strokeWidth={2}
-                        dot={{ fill: chartColors.accent, strokeWidth: 2, r: 4 }}
-                        activeDot={{ r: 6, fill: chartColors.accent }}
-                        connectNulls={false}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                ) : (
-                  /* Boolean routine: Bar chart with colored cells */
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart
-                      data={routineChartData}
-                      margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" stroke={chartColors.border} vertical={false} />
-                      <XAxis
-                        dataKey="dateShort"
-                        tick={{ fontSize: 10, fill: chartColors.muted }}
-                        tickLine={false}
-                        axisLine={{ stroke: chartColors.border }}
-                      />
-                      <YAxis
-                        tick={{ fontSize: 10, fill: chartColors.muted }}
-                        tickLine={false}
-                        axisLine={false}
-                        domain={[0, 1]}
-                        ticks={[0, 1]}
-                        tickFormatter={(v) => (v === 1 ? "Oui" : "Non")}
-                      />
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: chartColors.card,
-                          border: `1px solid ${chartColors.border}`,
-                          borderRadius: "12px",
-                          fontSize: "12px",
-                        }}
-                        labelStyle={{ color: chartColors.foreground, fontWeight: 600 }}
-                        formatter={(value: any) => [
-                          value === 1 ? "✓ Fait" : value === 0 ? "✗ Non fait" : "—",
-                          "Status",
-                        ]}
-                        labelFormatter={(label) => `Date: ${label}`}
-                      />
-                      <Bar dataKey="booleanValue" radius={[6, 6, 0, 0]} maxBarSize={40}>
-                        {routineChartData.map((entry, index) => (
-                          <Cell
-                            key={`cell-${index}`}
-                            fill={
-                              entry.completed === true
-                                ? chartColors.success
-                                : entry.completed === false
-                                ? chartColors.danger
-                                : chartColors.muted
-                            }
-                          />
-                        ))}
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
-                )}
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
             </CardContent>
           </Card>
-        </motion.div>
-      )}
+        </div>
+        {/* Slide 2: Détail par routine */}
+        <div className="min-w-full max-w-lg snap-center flex-shrink-0">
 
-      {/* Empty state */}
-      {data?.routines?.length === 0 && (
-        <motion.div
-          className="text-center py-12"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-        >
-          <Target className="w-12 h-12 text-muted mx-auto mb-3" />
-          <p className="text-muted font-medium">Aucune routine</p>
-          <p className="text-sm text-muted/60 mt-1">
-            Crée ta première routine pour voir les statistiques
-          </p>
-        </motion.div>
-      )}
+          {data?.routines && data.routines.length > 0 && (
+            <Card>
+              <CardHeader className="p-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm sm:text-base font-semibold text-foreground">
+                    Détail par routine
+                  </h3>
+                  {/* Routine Select Dropdown */}
+                  <div className="relative">
+                    <select
+                      value={selectedRoutineId || ""}
+                      onChange={(e) => setSelectedRoutineId(e.target.value)}
+                      className="appearance-none bg-background-secondary border border-border rounded-xl px-3 py-1.5 pr-8 text-xs sm:text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-accent cursor-pointer"
+                    >
+                      {data.routines.map((routine) => (
+                        <option key={routine.id} value={routine.id}>
+                          {routine.name}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-muted pointer-events-none" />
+                  </div>
+                </div>
+                {data.selectedRoutine && (
+                  <p className="text-xs text-muted mt-1">
+                    Type: {data.selectedRoutine.type === "BOOLEAN" ? "Oui/Non" : "Numérique"}
+                    {data.selectedRoutine.type === "NUMERIC" &&
+                      data.selectedRoutine.goal &&
+                      ` • Objectif: ${data.selectedRoutine.goal}`}
+                  </p>
+                )}
+              </CardHeader>
+              <CardContent className="p-2 sm:p-4 pt-0">
+                <div className="h-48 sm:h-64">
+                  {data.selectedRoutine?.type === "NUMERIC" ? (
+                    /* Numeric routine: Line chart with dots */
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart
+                        data={routineChartData}
+                        margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" stroke={chartColors.border} vertical={false} />
+                        <XAxis
+                          dataKey="dateShort"
+                          tick={{ fontSize: 10, fill: chartColors.muted }}
+                          tickLine={false}
+                          axisLine={{ stroke: chartColors.border }}
+                        />
+                        <YAxis
+                          tick={{ fontSize: 10, fill: chartColors.muted }}
+                          tickLine={false}
+                          axisLine={false}
+                          allowDecimals={false}
+                        />
+                        {data.selectedRoutine.goal && (
+                          <ReferenceLine
+                            y={data.selectedRoutine.goal}
+                            stroke={chartColors.success}
+                            strokeDasharray="5 5"
+                            label={{
+                              value: `Objectif: ${data.selectedRoutine.goal}`,
+                              position: "right",
+                              fontSize: 10,
+                              fill: chartColors.success,
+                            }}
+                          />
+                        )}
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: chartColors.card,
+                            border: `1px solid ${chartColors.border}`,
+                            borderRadius: "12px",
+                            fontSize: "12px",
+                          }}
+                          labelStyle={{ color: chartColors.foreground, fontWeight: 600 }}
+                          formatter={(value: any) => [
+                            value !== null && value !== undefined ? value : "—",
+                            "Valeur",
+                          ]}
+                          labelFormatter={(label) => `Date: ${label}`}
+                        />
+                        <Line
+                          type="monotone"
+                          dataKey="numericValue"
+                          stroke={chartColors.accent}
+                          strokeWidth={2}
+                          dot={{ fill: chartColors.accent, strokeWidth: 2, r: 4 }}
+                          activeDot={{ r: 6, fill: chartColors.accent }}
+                          connectNulls={false}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    /* Boolean routine: Bar chart with colored cells */
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={routineChartData}
+                        margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" stroke={chartColors.border} vertical={false} />
+                        <XAxis
+                          dataKey="dateShort"
+                          tick={{ fontSize: 10, fill: chartColors.muted }}
+                          tickLine={false}
+                          axisLine={{ stroke: chartColors.border }}
+                        />
+                        <YAxis
+                          tick={{ fontSize: 10, fill: chartColors.muted }}
+                          tickLine={false}
+                          axisLine={false}
+                          domain={[0, 1]}
+                          ticks={[0, 1]}
+                          tickFormatter={(v) => (v === 1 ? "Oui" : "Non")}
+                        />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: chartColors.card,
+                            border: `1px solid ${chartColors.border}`,
+                            borderRadius: "12px",
+                            fontSize: "12px",
+                          }}
+                          labelStyle={{ color: chartColors.foreground, fontWeight: 600 }}
+                          formatter={(value: any) => [
+                            value === 1 ? "✓ Fait" : value === 0 ? "✗ Non fait" : "—",
+                            "Status",
+                          ]}
+                          labelFormatter={(label) => `Date: ${label}`}
+                        />
+                        <Bar dataKey="booleanValue" radius={[6, 6, 0, 0]} maxBarSize={40}>
+                          {routineChartData.map((entry, index) => (
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={
+                                entry.completed === true
+                                  ? chartColors.success
+                                  : entry.completed === false
+                                    ? chartColors.danger
+                                    : chartColors.muted
+                              }
+                            />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+        </div>
+
+      </div>
+      {/* Pagination dots */}
+      <div className="absolute bottom-32 left-1/2 -translate-x-1/2 flex items-center gap-2">
+        {[0, 1].map((i) => (
+          <span
+            key={i}
+            className={`w-2 h-2 rounded-full transition-all duration-200 ${activeSlide === i ? 'bg-accent' : 'bg-muted/40'}`}
+            style={{ display: 'inline-block' }}
+          />
+        ))}
+      </div>
     </div>
   );
 }

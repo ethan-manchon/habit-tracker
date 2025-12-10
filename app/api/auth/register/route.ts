@@ -16,13 +16,11 @@ export async function POST(req: Request) {
     }
 
     const hashed = await bcrypt.hash(password, 10);
-    // create user and mark emailVerified immediately (auto-validate)
     const user = await prisma.user.create({
       data: {
         email,
         username: pseudo || null,
         password: hashed,
-        emailVerified: new Date(),
       },
     });
 

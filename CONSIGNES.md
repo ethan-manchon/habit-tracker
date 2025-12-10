@@ -40,9 +40,7 @@
     - Modifier ou supprimer une routine via paramètres
 - **Fréquence**
     - Configurer les jours d'affichage (jours cochés, 1 jour sur 2, en semaine, etc.)
-    - Nombre de fois par jour
 - **Affichage avancé**
-    - Drag & drop pour réorganiser les routines
     - Accès à un affichage graphique :
         - Pour routines **Oui/Non** : progression sur les jours
         - Pour routines **Numériques** : valeurs saisies sur les jours
@@ -59,7 +57,6 @@
 - Graphiques de progrès (ex : courbe sur 7/30 jours)
 - Affichage visuel de la série en cours (ex : "5 jours d’affilée")
 - Effets visuels selon la série (couleur, icône)
-- Personnalisation basique des couleurs/thèmes
 
 ### 3.2 Version 1.2 – Social & Comparaison
 
@@ -69,7 +66,7 @@
 
 ### 3.3 Version 1.3 – Personnalisation avancée
 
-- Plusieurs thèmes (sombre, clair, personnalisés)
+- Plusieurs thèmes (sombre, clair)
 - Statistiques hebdomadaires/mensuelles (ex : "80% de tes routines complétées ce mois-ci")
 - Exporter une image de ses progrès
 
