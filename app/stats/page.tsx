@@ -3,7 +3,7 @@ import { authOptions } from "@/app/auth";
 import { redirect } from "next/navigation";
 import Header from "@/components/Header";
 import FooterNav from "@/components/FooterNav";
-import StatsContent from "@/components/Content/StatsContent";
+import StatsSection from "@/components/sections/StatsSection";
 import { Stats } from "@/lib/Icon";
 
 export default async function StatsPage() {
@@ -16,7 +16,7 @@ export default async function StatsPage() {
   return (
     <div className="mx-3 sm:mx-6 md:mx-16">
       <Header title="Statistiques" />
-      <StatsContent />
+      <StatsSection />
       <FooterNav />
     </div>
 
